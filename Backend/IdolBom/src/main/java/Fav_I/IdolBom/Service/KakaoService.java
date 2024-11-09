@@ -7,6 +7,7 @@ import Fav_I.IdolBom.Repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpSession;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -100,7 +101,7 @@ public class KakaoService {
                 .build();
     }
 
-    public Optional<User> RegisterLogin(kakaoUserDTO kakaoUserDTO) throws JsonProcessingException {
+    public Optional<User> register(kakaoUserDTO kakaoUserDTO) {
         Long id = kakaoUserDTO.getId();
         Optional<User> userInfo = userRepository.findById(id);
 

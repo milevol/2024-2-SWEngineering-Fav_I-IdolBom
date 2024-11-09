@@ -3,6 +3,8 @@ package Fav_I.IdolBom.Controller;
 import Fav_I.IdolBom.DTO.getTokenDTO;
 import Fav_I.IdolBom.DTO.kakaoUserDTO;
 import Fav_I.IdolBom.Service.KakaoService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,11 +24,16 @@ public class LoginController {
 
     // get kakaoCode without Frontend
     @GetMapping("/callback")
-    public ResponseEntity<?> RegisterLogin(@RequestParam("code") String code) throws IOException {
+    public ResponseEntity<?> RegisterLogin(@RequestParam("code") String code, HttpServletRequest request) throws IOException {
         getTokenDTO accessToken = kakaoService.getAccessTokenFromKakao(code);
         kakaoUserDTO userInfo = kakaoService.getKakaoInfo(accessToken.getAccessToken());
         log.info(userInfo.toString());
-        kakaoService.RegisterLogin(userInfo);
+        kakaoService.register(userInfo);
+
+        HttpSession session = request.getSession();
+        session.setAttribute("userInfo:", userInfo);
+        session.setMaxInactiveInterval(60 * 60 * 24);
+
         return ResponseEntity.ok(userInfo);
     }
 

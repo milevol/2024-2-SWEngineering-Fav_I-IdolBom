@@ -14,7 +14,7 @@ import lombok.Setter;
 public class Idol {
     @Id
     @Column(name = "idolID", nullable = false)
-    private Integer id;
+    private Integer idol_id;
 
     @Size(max = 50)
     @NotNull

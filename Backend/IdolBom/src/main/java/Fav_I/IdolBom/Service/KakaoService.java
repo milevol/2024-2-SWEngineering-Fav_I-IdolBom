@@ -7,12 +7,9 @@ import Fav_I.IdolBom.Repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpSession;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.aop.AopAutoConfiguration;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -115,5 +112,9 @@ public class KakaoService {
             userRepository.save(newUser);
         }
         return userInfo;
+    }
+
+    public void setIdol(User user, int idol_id) {
+        userRepository.setIdol(user.getId(), idol_id);
     }
 }

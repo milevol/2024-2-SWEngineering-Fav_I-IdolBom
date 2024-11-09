@@ -12,7 +12,7 @@ import java.util.HashMap;
 @Builder
 @ToString
 public class kakaoUserDTO {
-    public Long id;
-    public String nickname;
-    public String profile_image;
+    public Long id; // 고유 id
+    public String nickname; // 카카오톡 상의 이름
+    public String profile_image; // 카카오톡 프로필 사진
 }

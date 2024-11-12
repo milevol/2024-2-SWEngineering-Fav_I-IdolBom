@@ -3,10 +3,7 @@ package Fav_I.IdolBom.Controller;
 import Fav_I.IdolBom.Entity.Schedule;
 import Fav_I.IdolBom.Service.ScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.List;
@@ -27,14 +24,18 @@ public class ScheduleController {
             @RequestParam int year,
             @RequestParam int month) {
 
-        List<Instant> result = scheduleService.getDatesWithSchedules(year, month, idolID);
-        System.out.println("Queried dates: " + result); // 디버깅용 로그
-        return result;
+        return  scheduleService.getDatesWithSchedules(year, month, idolID);
+        // System.out.println("Queried dates: " + result); // 디버깅용 로그
+        // return result;
     }
 
+
+
+
+
     // 디버깅용 전체 스케줄 조회 엔드포인트 추가
-    @GetMapping("/{idol_id}/schedules")
-    public List<Schedule> getAllSchedules(@PathVariable("idol_id") Integer idolID) {
-        return scheduleService.getAllSchedulesByIdol(idolID);
-    }
+//    @GetMapping("/{idol_id}/schedules")
+//    public List<Schedule> getAllSchedules(@PathVariable("idol_id") Integer idolID) {
+//        return scheduleService.getAllSchedulesByIdol(idolID);
+//    }
 }

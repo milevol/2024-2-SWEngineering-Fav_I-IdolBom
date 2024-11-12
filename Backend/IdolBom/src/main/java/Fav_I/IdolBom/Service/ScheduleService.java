@@ -1,6 +1,6 @@
 package Fav_I.IdolBom.Service;
 
-import Fav_I.IdolBom.Entity.Schedule;
+//import Fav_I.IdolBom.Entity.Schedule;
 import Fav_I.IdolBom.Repository.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

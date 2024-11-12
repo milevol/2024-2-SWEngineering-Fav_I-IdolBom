@@ -1,6 +1,6 @@
 package Fav_I.IdolBom.Controller;
 
-import Fav_I.IdolBom.Entity.Schedule;
+//import Fav_I.IdolBom.Entity.Schedule;
 import Fav_I.IdolBom.Service.ScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

@@ -5,12 +5,15 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
 @Setter
 @Entity
+@RequiredArgsConstructor
 public class Ticketing {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ticketingID", nullable = false)
     private Integer id;
 
@@ -37,6 +40,6 @@ public class Ticketing {
 
     @NotNull
     @Column(name = "ticketingStatus", nullable = false)
-    private Byte ticketingStatus;
+    private int ticketingStatus; // 수정될 수 있음 
 
 }

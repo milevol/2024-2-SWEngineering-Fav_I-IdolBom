@@ -1,14 +1,14 @@
 package Fav_I.IdolBom.Service;
 
-//import Fav_I.IdolBom.Entity.Schedule;
+import Fav_I.IdolBom.DTO.ScheduleDTO;
+import Fav_I.IdolBom.Entity.Schedule;
 import Fav_I.IdolBom.Repository.ScheduleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,10 +21,10 @@ public class ScheduleService {
         this.scheduleRepository = scheduleRepository;
     }
 
-    public List<Instant> getDatesWithSchedules(int year, int month, Integer idolID) {
-        // 유효하지 않은 idolID 예외 발생
-        if(idolID == null || idolID < 0) {
-            throw new IllegalArgumentException("유효하지 않은 idolID입니다. ");
+    // 특정 월에 스케줄이 존재하는 날짜 리스트 반환
+    public List<ScheduleDTO> getDatesWithSchedules(int year, int month, Integer idolID) {
+        if (idolID == null || idolID < 0) {
+            throw new IllegalArgumentException("유효하지 않은 idolID입니다.");
         }
 
         // 해당 연도와 월의 시작과 끝을 Instant로 계산
@@ -32,18 +32,53 @@ public class ScheduleService {
         LocalDateTime endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.toLocalDate().lengthOfMonth())
                 .withHour(23).withMinute(59).withSecond(59);
 
-        Instant startDate = startOfMonth.toInstant(ZoneOffset.UTC);
-        Instant endDate = endOfMonth.toInstant(ZoneOffset.UTC);
+        // Instant를 Timestamp로 변환하여 전달
+        Timestamp startDate = Timestamp.valueOf(startOfMonth);
+        Timestamp endDate = Timestamp.valueOf(endOfMonth);
 
-        // 한국 시간대로 맞춤 - 데이터베이스에서 Timestamp 리스트를 받아서 Instant 리스트로 변환 후 9시간 추가 (한국 시간대)
-        List<Timestamp> dates = scheduleRepository.findDatesWithSchedules(idolID, startDate, endDate);
-        return dates.stream()
-                .map(timestamp -> timestamp.toInstant().plusSeconds(9 * 3600))
+        List<Schedule> schedules = scheduleRepository.findDatesWithSchedules(idolID, startDate, endDate);
+
+        return schedules.stream()
+                .map(schedule -> {
+                    ScheduleDTO dto = new ScheduleDTO();
+                    dto.setId(schedule.getId());
+                    dto.setIdolID(schedule.getIdolID().getIdol_id());
+                    dto.setScheduleName(schedule.getScheduleName());
+                    dto.setScheduleDate(schedule.getScheduleDate());
+                    dto.setOriginUrl(schedule.getOriginUrl());
+                    dto.setDescription(schedule.getDescription());
+                    dto.setLocation(schedule.getLocation());
+                    dto.setIsTicketing(schedule.getIsTicketing() != null && schedule.getIsTicketing() == 1);
+                    return dto;
+                })
                 .collect(Collectors.toList());
-
     }
 
-//    public List<Schedule> getAllSchedulesByIdol(Integer idolID) {
-//        return scheduleRepository.getAllSchedulesByIdol(idolID);
-//    }
+    // 특정 날짜에 해당하는 스케줄 전체 정보 리스트 반환
+    public List<ScheduleDTO> getSchedulesByDate(Integer idolID, String selectedDate) {
+        if (idolID == null || idolID < 0) {
+            throw new IllegalArgumentException("유효하지 않은 idolID입니다.");
+        }
+
+        // 특정 날짜에 해당하는 스케줄 ID 리스트 조회
+        List<Integer> scheduleIds = scheduleRepository.findScheduleIdsByDate(idolID, selectedDate);
+
+        // ID 리스트에 해당하는 스케줄 전체 정보 조회
+        List<Schedule> schedules = scheduleRepository.findSchedulesByIds(scheduleIds);
+
+        return schedules.stream()
+                .map(schedule -> {
+                    ScheduleDTO dto = new ScheduleDTO();
+                    dto.setId(schedule.getId());
+                    dto.setIdolID(schedule.getIdolID().getIdol_id());
+                    dto.setScheduleName(schedule.getScheduleName());
+                    dto.setScheduleDate(schedule.getScheduleDate());
+                    dto.setOriginUrl(schedule.getOriginUrl());
+                    dto.setDescription(schedule.getDescription());
+                    dto.setLocation(schedule.getLocation());
+                    dto.setIsTicketing(schedule.getIsTicketing() != null && schedule.getIsTicketing() == 1);
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
 }

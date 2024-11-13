@@ -37,4 +37,14 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
     // 스케줄 ID 리스트로 해당 스케줄의 전체 정보 조회
     @Query(value = "SELECT * FROM Schedule s WHERE s.scheduleID IN :ids", nativeQuery = true)
     List<Schedule> findSchedulesByIds(@Param("ids") List<Integer> ids);
+
+    // 전날, 당일, 다음날의 스케줄을 조회
+    @Query(value = "SELECT * FROM Schedule s " +
+            "WHERE s.idolID = :idolID " +
+            "AND s.scheduleDate BETWEEN :startOfRange AND :endOfRange",
+            nativeQuery = true)
+    List<Schedule> findSchedulesByDateRange(
+            @Param("idolID") Integer idolID,
+            @Param("startOfRange") Timestamp startOfRange,
+            @Param("endOfRange") Timestamp endOfRange);
 }

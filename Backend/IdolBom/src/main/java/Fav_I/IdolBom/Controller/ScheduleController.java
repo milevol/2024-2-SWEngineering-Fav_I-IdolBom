@@ -32,4 +32,12 @@ public class ScheduleController {
             @RequestParam("selectedDate") String selectedDate) {
         return scheduleService.getSchedulesByDate(idolID, selectedDate);
     }
+
+    // 오늘 날짜 기준으로 전날, 당일, 다음날의 스케줄 전체 정보 반환
+    @GetMapping("/{idol_id}/schedule/around")
+    public List<ScheduleDTO> getSchedulesAroundDate(
+            @PathVariable("idol_id") Integer idolID,
+            @RequestParam("selectedDate") String selectedDate) {
+        return scheduleService.getSchedulesAroundDate(idolID, selectedDate);
+    }
 }

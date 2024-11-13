@@ -81,4 +81,37 @@ public class ScheduleService {
                 })
                 .collect(Collectors.toList());
     }
+
+    // 특정 날짜 기준으로 전날, 당일, 다음날의 스케줄 전체 정보를 반환하는 메서드
+    public List<ScheduleDTO> getSchedulesAroundDate(Integer idolID, String selectedDate) {
+        if (idolID == null || idolID < 0) {
+            throw new IllegalArgumentException("유효하지 않은 idolID입니다.");
+        }
+
+        // 선택된 날짜를 기준으로 전날, 당일, 다음날 범위 설정
+        LocalDate selectedLocalDate = LocalDate.parse(selectedDate);
+        LocalDateTime startOfRange = selectedLocalDate.minusDays(1).atStartOfDay();
+        LocalDateTime endOfRange = selectedLocalDate.plusDays(1).atTime(23, 59, 59);
+
+        Timestamp startOfRangeTimestamp = Timestamp.valueOf(startOfRange);
+        Timestamp endOfRangeTimestamp = Timestamp.valueOf(endOfRange);
+
+        // Repository에서 해당 범위에 포함된 스케줄 목록 조회
+        List<Schedule> schedules = scheduleRepository.findSchedulesByDateRange(idolID, startOfRangeTimestamp, endOfRangeTimestamp);
+
+        return schedules.stream()
+                .map(schedule -> {
+                    ScheduleDTO dto = new ScheduleDTO();
+                    dto.setId(schedule.getId());
+                    dto.setIdolID(schedule.getIdolID().getIdol_id());
+                    dto.setScheduleName(schedule.getScheduleName());
+                    dto.setScheduleDate(schedule.getScheduleDate());
+                    dto.setOriginUrl(schedule.getOriginUrl());
+                    dto.setDescription(schedule.getDescription());
+                    dto.setLocation(schedule.getLocation());
+                    dto.setIsTicketing(schedule.getIsTicketing() != null && schedule.getIsTicketing() == 1);
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
 }

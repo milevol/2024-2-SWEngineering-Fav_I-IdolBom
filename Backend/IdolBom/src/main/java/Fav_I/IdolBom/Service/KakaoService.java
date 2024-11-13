@@ -1,7 +1,7 @@
 package Fav_I.IdolBom.Service;
 
-import Fav_I.IdolBom.DTO.getTokenDTO;
-import Fav_I.IdolBom.DTO.kakaoUserDTO;
+import Fav_I.IdolBom.DTO.GetTokenDTO;
+import Fav_I.IdolBom.DTO.KakaoUserDTO;
 import Fav_I.IdolBom.Entity.User;
 import Fav_I.IdolBom.Repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,7 +33,7 @@ public class KakaoService {
     @Value("${kakao.redirect_uri}")
     private String redirectUri;
 
-    public getTokenDTO getAccessTokenFromKakao(String code) throws JsonProcessingException {
+    public GetTokenDTO getAccessTokenFromKakao(String code) throws JsonProcessingException {
         String reqUrl = "https://kauth.kakao.com/oauth/token";
         RestTemplate rt = new RestTemplate();
 
@@ -56,14 +56,14 @@ public class KakaoService {
 
         String responseBody = response.getBody();
         ObjectMapper objectMapper = new ObjectMapper();
-        getTokenDTO authResponse = objectMapper.readValue(responseBody, getTokenDTO.class);
+        GetTokenDTO authResponse = objectMapper.readValue(responseBody, GetTokenDTO.class);
 
         log.info("** Get Kakao Token Succeed.");
 
         return authResponse;
     }
 
-    public kakaoUserDTO getKakaoInfo(String accessToken) throws JsonProcessingException {
+    public KakaoUserDTO getKakaoInfo(String accessToken) throws JsonProcessingException {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
@@ -91,14 +91,14 @@ public class KakaoService {
                 .get("nickname").asText();
 
         log.info("** Get Kakao User Info Succeed.");
-        return kakaoUserDTO.builder()
+        return KakaoUserDTO.builder()
                 .id(id)
                 .profile_image(profile_image)
                 .nickname(nickname)
                 .build();
     }
 
-    public Optional<User> register(kakaoUserDTO kakaoUserDTO) {
+    public Optional<User> register(KakaoUserDTO kakaoUserDTO) {
         Long id = kakaoUserDTO.getId();
         Optional<User> userInfo = userRepository.findById(id);
 

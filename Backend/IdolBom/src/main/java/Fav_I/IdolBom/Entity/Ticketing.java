@@ -4,13 +4,16 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@RequiredArgsConstructor
 @Entity
 public class Ticketing {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ticketingID", nullable = false)
     private Integer id;
 
@@ -36,7 +39,7 @@ public class Ticketing {
     private String requestMessage;
 
     @NotNull
-    @Column(name = "ticketingStatus", nullable = false)
-    private Byte ticketingStatus;
+    @Column(name = "ticketingStatus", nullable = false, columnDefinition = "int default 0")
+    private int ticketingStatus;
 
 }

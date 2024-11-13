@@ -1,7 +1,7 @@
 package Fav_I.IdolBom.Controller;
 
-import Fav_I.IdolBom.DTO.getTokenDTO;
-import Fav_I.IdolBom.DTO.kakaoUserDTO;
+import Fav_I.IdolBom.DTO.GetTokenDTO;
+import Fav_I.IdolBom.DTO.KakaoUserDTO;
 import Fav_I.IdolBom.Entity.User;
 import Fav_I.IdolBom.Service.KakaoService;
 import jakarta.servlet.http.HttpSession;
@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -33,8 +32,8 @@ public class LoginController {
         User loginUser = new User();
 
         try {
-            getTokenDTO accessToken = kakaoService.getAccessTokenFromKakao(code);
-            kakaoUserDTO userInfo = kakaoService.getKakaoInfo(accessToken.getAccessToken());
+            GetTokenDTO accessToken = kakaoService.getAccessTokenFromKakao(code);
+            KakaoUserDTO userInfo = kakaoService.getKakaoInfo(accessToken.getAccessToken());
             log.info(userInfo.toString());
             kakaoService.register(userInfo);
 

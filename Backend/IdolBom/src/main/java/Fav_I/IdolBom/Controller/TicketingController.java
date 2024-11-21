@@ -1,6 +1,7 @@
 package Fav_I.IdolBom.Controller;
 
 import Fav_I.IdolBom.DTO.TicketingFormDTO;
+import Fav_I.IdolBom.Entity.Matching;
 import Fav_I.IdolBom.Entity.Ticketing;
 import Fav_I.IdolBom.Entity.User;
 import Fav_I.IdolBom.Service.TicketingService;
@@ -10,10 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -48,6 +46,8 @@ public class TicketingController {
     @PutMapping("/ticketing/submit/{schedule_id}")
     public ResponseEntity<Map<String, Object>> submitTicketing(HttpSession session, @PathVariable("schedule_id") int schedule_id, @RequestBody TicketingFormDTO formDTO) {
         Map<String, Object> response = new LinkedHashMap<>();
+        System.out.println(formDTO);
+
         Object currentUser = session.getAttribute("userInfo");
 
         try {
@@ -57,6 +57,41 @@ public class TicketingController {
             response.put("submitted_user", currentUser);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch(Exception e) {
+            response.put("code", "Error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @PutMapping("/ticketing/match/{ticketing_id}")
+    public ResponseEntity<?> matchTicketing(HttpSession session, @PathVariable("ticketing_id") int ticketing_id) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        Object agentUser = session.getAttribute("userInfo");
+
+        try {
+            Matching match = ticketingService.matchTicketing((User) agentUser, ticketing_id);
+            response.put("code", "SU");
+            response.put("message", "Success.");
+            response.put("matched", match);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            response.put("code", "Error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @PostMapping("/ticketing/rematch/{matching_id}")
+    public ResponseEntity<?> rematchTicketing(@PathVariable("matching_id") int matching_id) {
+        Map<String, Object> response = new LinkedHashMap<>();
+
+        try {
+            Ticketing canceled = ticketingService.reMatchTicketing(matching_id);
+            response.put("code", "SU");
+            response.put("message", "Success.");
+            response.put("canceled", canceled);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
             response.put("code", "Error");
             response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);

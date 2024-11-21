@@ -23,7 +23,7 @@ import java.util.Optional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class KakaoService {
+public class LoginService {
 
     private final UserRepository userRepository;
 
@@ -116,5 +116,9 @@ public class KakaoService {
 
     public void setIdol(User user, int idol_id) {
         userRepository.setIdol(user.getId(), idol_id);
+    }
+
+    public User getMyInfo(Long id) {
+        return userRepository.findById(id).orElse(null);
     }
 }

@@ -1,12 +1,11 @@
 package Fav_I.IdolBom.DTO;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
-@Data
-@Builder
+@Getter
+@Setter
 @ToString
+@NoArgsConstructor
 public class TicketingFormDTO {
     private Integer ticketNum;
     private String seatingType;

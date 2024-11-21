@@ -18,12 +18,12 @@ public class Ticketing {
     private Integer id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "applicantID", nullable = false)
     private User applicantID;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "scheduleID", nullable = false)
     private Schedule scheduleID;
 
@@ -42,4 +42,7 @@ public class Ticketing {
     @Column(name = "ticketingStatus", nullable = false, columnDefinition = "int default 0")
     private int ticketingStatus;
 
+    @NotNull
+    @Column(name = "isRematch", nullable = false, columnDefinition = "int default 0")
+    private Integer isRematch = 0;
 }

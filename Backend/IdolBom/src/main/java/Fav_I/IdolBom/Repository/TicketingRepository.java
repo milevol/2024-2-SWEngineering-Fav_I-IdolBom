@@ -1,18 +1,22 @@
 package Fav_I.IdolBom.Repository;
 
 import Fav_I.IdolBom.Entity.Ticketing;
+import Fav_I.IdolBom.Entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 public interface TicketingRepository extends JpaRepository<Ticketing, Integer> {
-    @Query(value = "insert into Ticketing(applicantID, scheduleID, ticketNum, seatingType, requestMessage) " +
-            "values(:user_id, :schedule_id, :ticket_num, :seating_type, :request_message)", nativeQuery = true)
+    @Query(value = "select * from Ticketing where ticketingStatus = 0", nativeQuery = true)
+    List<Ticketing> findNotMatched();
+    List<Ticketing> findAllByApplicantID(User user);
+
     @Modifying
     @Transactional
-    void submit(@Param(value = "user_id") Long user_id, @Param(value = "schedule_id") int schedule_id,
-                     @Param(value = "ticket_num") Integer ticket_num, @Param(value = "seating_type") String seating_type,
-                     @Param(value = "request_message") String request_message);
+    @Query(value = "UPDATE Ticketing SET ticketingStatus = 3 WHERE applicantID = :applicantID", nativeQuery = true)
+    void updateTicketingStatusByApplicantID(@Param(value = "applicantID") Long applicantID);
 }

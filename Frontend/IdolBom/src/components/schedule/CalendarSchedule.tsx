@@ -43,17 +43,39 @@ const ScheduleCardList = styled(ScrollView)`
   margin-bottom: 70px;
 `;
 
-export default function CalendarSchedule({ onDaySelect, onCollapse, calendarExpanded }) {
+export default function CalendarSchedule({ navigation, onDaySelect, onCollapse, calendarExpanded }) {
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  // 스케줄 데이터 예시
+  // 임의의 스케줄 데이터
   const schedules = [
-    { title: '미팅', details: '2024-11-15, 서울역' },
-    { title: '프로젝트 회의', details: '2024-11-16, 강남구청' },
-    { title: '스터디 모임', details: '2024-11-17, 스타벅스' },
-    { title: '개발 발표', details: '2024-11-18, 회사 사무실' },
-    { title: '회식', details: '2024-11-19, 종로' },
+    {
+      id: 1,
+      title: '미팅',
+      date: '2024-11-15',
+      location: '서울역',
+      type: '회의',
+      description: '프로젝트 관련 미팅이 진행됩니다.',
+      link: 'https://example.com/meeting'
+    },
+    {
+      id: 2,
+      title: '프로젝트 회의',
+      date: '2024-11-16',
+      location: '강남구청',
+      type: '회의',
+      description: '프로젝트 팀원들과 함께 회의합니다.',
+      link: 'https://example.com/project'
+    },
+    // 다른 스케줄 데이터...
   ];
+
+  const handleSchedulePress = (schedule) => {
+    if (navigation) {
+      navigation.navigate('ScheduleDetail', { schedule });
+    } else {
+      console.error('Navigation object not found');
+    }
+  };
 
   return (
     <>
@@ -65,7 +87,7 @@ export default function CalendarSchedule({ onDaySelect, onCollapse, calendarExpa
                 <Picker
                   selectedValue={selectedCategory}
                   onValueChange={(itemValue) => setSelectedCategory(itemValue)}
-                  style={{ height: 30, color: '#000' }} // 스타일 추가
+                  style={{ height: 30, color: '#000' }}
                 >
                   <Picker.Item label="카테고리 선택" value="all" />
                   <Picker.Item label="미팅" value="meeting" />
@@ -103,10 +125,14 @@ export default function CalendarSchedule({ onDaySelect, onCollapse, calendarExpa
           />
         </CalendarWrapper>
       </WhiteRectangle>
-      {/* WhiteRectangle 아래에 스크롤 가능한 스케줄 카드 리스트 */}
       <ScheduleCardList>
-        {schedules.map((schedule, index) => (
-          <ScheduleCard key={index} title={schedule.title} details={schedule.details} />
+        {schedules.map((schedule) => (
+          <ScheduleCard
+            key={schedule.id}
+            title={schedule.title}
+            details={`${schedule.date}, ${schedule.location}`}
+            onPress={() => handleSchedulePress(schedule)}
+          />
         ))}
       </ScheduleCardList>
     </>

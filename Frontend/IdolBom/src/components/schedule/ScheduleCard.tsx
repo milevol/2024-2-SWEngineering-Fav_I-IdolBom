@@ -1,8 +1,10 @@
+// ScheduleCard.tsx
 import React from 'react';
 import styled from 'styled-components/native';
 import Feather from 'react-native-vector-icons/Feather';
+import { TouchableOpacity } from 'react-native';
 
-const CardContainer = styled.View`
+const CardContainer = styled(TouchableOpacity)`
   width: 374px;
   height: 114px;
   margin: 7px 21px;
@@ -38,9 +40,9 @@ const ArrowIcon = styled(Feather)`
   color: #888888;
 `;
 
-export default function ScheduleCard({ title, details }) {
+export default function ScheduleCard({ title, details, onPress }) {
   return (
-    <CardContainer>
+    <CardContainer onPress={onPress}>
       <TitleText>{title}</TitleText>
       <DetailsText>{details}</DetailsText>
       <ArrowIcon name="arrow-right-circle" size={30} />

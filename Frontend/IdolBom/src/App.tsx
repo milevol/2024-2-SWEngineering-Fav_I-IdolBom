@@ -3,9 +3,10 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import HomeScreen from './screens/home/HomeScreen';
+import HomeScreen from './screens/HomeScreen';
 import BottomBar from './components/common/BottomBar';
 import TopBar from './components/common/TopBar';
+import ScheduleDetailScreen from './screens/ScheduleDetailScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -15,9 +16,18 @@ const MainTabs = () => {
     <>
       <TopBar />
       <Tab.Navigator tabBar={() => <BottomBar />}>
-        <Tab.Screen name="Home" component={HomeScreen} options={{ headerShown: false }}/>
+        <Tab.Screen name="Home" component={HomeStack} options={{ headerShown: false }} />
       </Tab.Navigator>
     </>
+  );
+};
+
+const HomeStack = () => {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="HomeScreen" component={HomeScreen} />
+      <Stack.Screen name="ScheduleDetail" component={ScheduleDetailScreen} />
+    </Stack.Navigator>
   );
 };
 

@@ -58,7 +58,7 @@ const ChatListScreen: React.FC = () => {
       lastMessage={item.lastMessage}
       schedule={item.schedule}
       unreadCount={item.unreadCount}
-      onPress={() => navigation.navigate('ChatScreen', { chatId: item.id })}
+      onPress={() => navigation.navigate('ChatScreen', { chatId: item.id, title: item.title })} // title 전달
     />
   );
 
@@ -73,6 +73,7 @@ const ChatListScreen: React.FC = () => {
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

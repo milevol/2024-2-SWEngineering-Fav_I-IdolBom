@@ -34,7 +34,7 @@ public class LoginService {
     private String redirectUri;
 
     // 원본
-    public getTokenDTO getAccessTokenFromKakao(String code) throws JsonProcessingException {
+    public GetTokenDTO getAccessTokenFromKakao(String code) throws JsonProcessingException {
         String reqUrl = "https://kauth.kakao.com/oauth/token";
         RestTemplate rt = new RestTemplate();
 
@@ -68,7 +68,7 @@ public class LoginService {
 
         String responseBody = response.getBody();
         ObjectMapper objectMapper = new ObjectMapper();
-        getTokenDTO authResponse = objectMapper.readValue(responseBody, getTokenDTO.class);
+        GetTokenDTO authResponse = objectMapper.readValue(responseBody, GetTokenDTO.class);
 
         log.info("** Get Kakao Token Succeed.");
 

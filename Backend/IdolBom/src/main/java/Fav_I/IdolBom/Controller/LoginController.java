@@ -41,11 +41,11 @@ public class LoginController {
         try {
             log.info("GET Request Received. Authorization Code: {}", code);
             // 카카오 토큰 요청
-            getTokenDTO accessToken = loginService.getAccessTokenFromKakao(code);
+            GetTokenDTO accessToken = loginService.getAccessTokenFromKakao(code);
 
             log.info("kakao accessToken : {}", accessToken);
             // 사용자 정보 요청
-            kakaoUserDTO userInfo = loginService.getKakaoInfo(accessToken.getAccessToken());
+            KakaoUserDTO userInfo = loginService.getKakaoInfo(accessToken.getAccessToken());
             log.info(userInfo.toString());
 
             // 사용자 등록

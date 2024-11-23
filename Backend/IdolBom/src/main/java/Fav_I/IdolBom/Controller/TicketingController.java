@@ -48,6 +48,7 @@ public class TicketingController {
         System.out.println(formDTO);
 
         Object currentUser = session.getAttribute("userInfo");
+
         try {
             ticketingService.submitTicketing((User)currentUser, schedule_id, formDTO);
             response.put("code", "SU");

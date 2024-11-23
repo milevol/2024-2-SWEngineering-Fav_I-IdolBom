@@ -1,9 +1,12 @@
 package Fav_I.IdolBom.Controller;
 
-import Fav_I.IdolBom.DTO.getTokenDTO;
-import Fav_I.IdolBom.DTO.kakaoUserDTO;
+import Fav_I.IdolBom.DTO.GetTokenDTO;
+import Fav_I.IdolBom.DTO.KakaoUserDTO;
+import Fav_I.IdolBom.Entity.Ticketing;
 import Fav_I.IdolBom.Entity.User;
 import Fav_I.IdolBom.Service.LoginService;
+import Fav_I.IdolBom.Service.TicketingService;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +15,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -23,10 +30,14 @@ public class LoginController {
     private final LoginService loginService;
     @Autowired
     private HttpSession session;
+    @Autowired
+    private TicketingService ticketingService;
+
 
     @GetMapping("/callback")
     public ResponseEntity<?> handleCallback(@RequestParam("code") String code) {
         Map<String, Object> response = new LinkedHashMap<>();
+      
         try {
             log.info("GET Request Received. Authorization Code: {}", code);
             // 카카오 토큰 요청
@@ -41,7 +52,6 @@ public class LoginController {
             loginService.register(userInfo);
             session.setAttribute("userInfo", userInfo);
             session.setMaxInactiveInterval(60 * 60 * 24); // 24시간
-
 
             // 응답 데이터 구성
             response.put("code", "SU");
@@ -58,6 +68,7 @@ public class LoginController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
 
 
     @GetMapping("/idol/{idol_id}")
@@ -78,9 +89,37 @@ public class LoginController {
             response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-
     }
 
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyPage() {
+        Map<String, Object> response = new LinkedHashMap<>();
 
+        // for test
+        User user = new User();
+        user.setId(12345L);
+        session.setAttribute("userInfo", user);
+        Object currentUser = session.getAttribute("userInfo");
+        Long user_id = ((User) currentUser).getId();
 
+        try {
+            User user_from_table = loginService.getMyInfo(user_id);
+            if (user_from_table == null) {
+                throw new NullPointerException("no user found!");
+            }
+            List<Ticketing> ticketingList = ticketingService.getMyTicketingList(user_from_table)
+                    .stream()
+                    .sorted(Comparator.comparingInt(Ticketing::getTicketingStatus))
+                    .collect(Collectors.toList());
+            response.put("code", "SU");
+            response.put("message", "Success.");
+            response.put("userInfo", user_from_table);
+            response.put("ticketingList", ticketingList);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            response.put("code", "Error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 }

@@ -4,11 +4,13 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @Setter
+@RequiredArgsConstructor
 @Entity
 @RequiredArgsConstructor
 public class Ticketing {
@@ -39,10 +41,11 @@ public class Ticketing {
     private String requestMessage;
 
     @NotNull
-    @Column(name = "ticketingStatus", nullable = false)
-    private int ticketingStatus; // 수정될 수 있음
+    @Column(name = "ticketingStatus", nullable = false, columnDefinition = "int default 0")
+    private int ticketingStatus = 0;
 
     @NotNull
     @Column(name = "isRematch", nullable = false, columnDefinition = "int default 0")
-    private int isRematch = 0;
+    private Integer isRematch = 0;
+  
 }

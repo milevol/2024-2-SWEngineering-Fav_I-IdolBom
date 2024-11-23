@@ -1,9 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import styled from 'styled-components/native';
-import { useNavigation } from '@react-navigation/native'; // useNavigation 추가
-import BottomBar from '../../components/common/BottomBar'; // BottomBar 컴포넌트를 불러옵니다.
+import { useNavigation, useRoute } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import BackIcon from 'react-native-vector-icons/MaterialIcons';
+import BottomBar from '../../components/common/BottomBar';
 
 // 시간 형식을 "오전/오후 시간:분"으로 변환하는 함수
 const formatAMPM = (date) => {
@@ -17,7 +18,6 @@ const formatAMPM = (date) => {
   return strTime;
 };
 
-// 스타일드 컴포넌트 정의
 const KeyboardAvoidingContainer = styled(KeyboardAvoidingView)`
   flex: 1;
   background-color: #ffffff;
@@ -107,7 +107,6 @@ const MessageTime = styled.Text`
   margin-left: 10px;
 `;
 
-// 채팅 입력창 및 버튼 스타일 정의
 const StyledInputContainer = styled.View`
   position: absolute;
   width: 380px;
@@ -139,7 +138,9 @@ const SendButton = styled(TouchableOpacity)`
 `;
 
 const ChatScreen = () => {
-  const navigation = useNavigation(); // 뒤로 가기 기능을 위한 useNavigation 훅 사용
+  const navigation = useNavigation();
+   const route = useRoute();
+    const { title } = route.params;
 
   const [messages, setMessages] = useState([
     {
@@ -166,7 +167,7 @@ const ChatScreen = () => {
         id: `${messages.length + 1}`,
         sender: '닉네임2',
         message: inputText,
-        time: formatAMPM(new Date()), // 오전/오후 시간:분 형식 적용
+        time: formatAMPM(new Date()),
         isSentByUser: true,
       };
       setMessages([...messages, newMessage]);
@@ -175,51 +176,51 @@ const ChatScreen = () => {
     }
   };
 
-  return (
-    <KeyboardAvoidingContainer behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={90}>
-      <Header>
-        <TouchableOpacity onPress={() => navigation.goBack()}> {/* 뒤로 가기 기능 */}
-          <Icon name="arrow-left" size={30} color="#000" />
-        </TouchableOpacity>
-        <HeaderTitle>아임히어로 같이가요~</HeaderTitle>
-      </Header>
+   return (
+      <KeyboardAvoidingContainer behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={90}>
+        <Header>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <BackIcon name="arrow-back-ios" size={30} color="#000" />
+          </TouchableOpacity>
+          <HeaderTitle>{title}</HeaderTitle>
+        </Header>
 
-      <DateContainer>
-        <Icon name="calendar" size={20} color="#B3B3B3" />
-        <DateText>2024년 10월 12일</DateText>
-      </DateContainer>
+        <DateContainer>
+          <Icon name="calendar" size={20} color="#B3B3B3" />
+          <DateText>2024년 10월 12일</DateText>
+        </DateContainer>
 
-      <ScrollView ref={scrollViewRef} style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }}>
-        {messages.map((msg) => (
-          <MessageRow key={msg.id} isSentByUser={msg.isSentByUser}>
-            {!msg.isSentByUser && <AvatarIcon name="account-circle" size={40} />}
-            <MessageContainer>
-              {!msg.isSentByUser && <SenderName>{msg.sender}</SenderName>}
-              <MessageBubble isSentByUser={msg.isSentByUser}>
-                <MessageText isSentByUser={msg.isSentByUser}>{msg.message}</MessageText>
-              </MessageBubble>
-              <MessageTime>{msg.time}</MessageTime>
-            </MessageContainer>
-          </MessageRow>
-        ))}
-      </ScrollView>
+        <ScrollView ref={scrollViewRef} style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }}>
+          {messages.map((msg) => (
+            <MessageRow key={msg.id} isSentByUser={msg.isSentByUser}>
+              {!msg.isSentByUser && <AvatarIcon name="account-circle" size={40} />}
+              <MessageContainer>
+                {!msg.isSentByUser && <SenderName>{msg.sender}</SenderName>}
+                <MessageBubble isSentByUser={msg.isSentByUser}>
+                  <MessageText isSentByUser={msg.isSentByUser}>{msg.message}</MessageText>
+                </MessageBubble>
+                <MessageTime>{msg.time}</MessageTime>
+              </MessageContainer>
+            </MessageRow>
+          ))}
+        </ScrollView>
 
-      <StyledInputContainer>
-        <StyledTextInput
-          value={inputText}
-          onChangeText={setInputText}
-          placeholder="메시지를 입력하세요"
-          placeholderTextColor="#B3B3B3"
-          multiline
-        />
-        <SendButton onPress={handleSend}>
-          <Icon name="send" size={20} color="#FFFFFF" />
-        </SendButton>
-      </StyledInputContainer>
+        <StyledInputContainer>
+          <StyledTextInput
+            value={inputText}
+            onChangeText={setInputText}
+            placeholder="메시지를 입력하세요"
+            placeholderTextColor="#B3B3B3"
+            multiline
+          />
+          <SendButton onPress={handleSend}>
+            <Icon name="send" size={20} color="#FFFFFF" />
+          </SendButton>
+        </StyledInputContainer>
 
-      <BottomBar /> {/* BottomBar를 화면 하단에 배치합니다 */}
-    </KeyboardAvoidingContainer>
-  );
-};
+        <BottomBar />
+      </KeyboardAvoidingContainer>
+    );
+  };
 
 export default ChatScreen;

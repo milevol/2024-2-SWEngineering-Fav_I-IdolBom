@@ -3,7 +3,7 @@ package Fav_I.IdolBom.Controller;
 import Fav_I.IdolBom.DTO.getTokenDTO;
 import Fav_I.IdolBom.DTO.kakaoUserDTO;
 import Fav_I.IdolBom.Entity.User;
-import Fav_I.IdolBom.Service.KakaoService;
+import Fav_I.IdolBom.Service.LoginService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,8 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -22,7 +20,7 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 public class LoginController {
-    private final KakaoService kakaoService;
+    private final LoginService loginService;
     @Autowired
     private HttpSession session;
 
@@ -32,15 +30,15 @@ public class LoginController {
         try {
             log.info("GET Request Received. Authorization Code: {}", code);
             // 카카오 토큰 요청
-            getTokenDTO accessToken = kakaoService.getAccessTokenFromKakao(code);
+            getTokenDTO accessToken = loginService.getAccessTokenFromKakao(code);
 
             log.info("kakao accessToken : {}", accessToken);
             // 사용자 정보 요청
-            kakaoUserDTO userInfo = kakaoService.getKakaoInfo(accessToken.getAccessToken());
+            kakaoUserDTO userInfo = loginService.getKakaoInfo(accessToken.getAccessToken());
             log.info(userInfo.toString());
 
             // 사용자 등록
-            kakaoService.register(userInfo);
+            loginService.register(userInfo);
             session.setAttribute("userInfo", userInfo);
             session.setMaxInactiveInterval(60 * 60 * 24); // 24시간
 
@@ -68,7 +66,7 @@ public class LoginController {
         Object currentUser = session.getAttribute("userInfo");
 
         try {
-            kakaoService.setIdol((User)currentUser, idol_id);
+            loginService.setIdol((User)currentUser, idol_id);
             response.put("code", "SU");
             response.put("message", "idol set successfully.");
             response.put("loginUser", ((User) currentUser).getId());

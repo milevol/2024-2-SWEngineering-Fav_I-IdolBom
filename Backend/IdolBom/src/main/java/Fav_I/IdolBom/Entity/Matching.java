@@ -16,12 +16,12 @@ public class Matching {
     private Integer id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "applicantID", nullable = false)
     private User applicantID;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "agentID", nullable = false)
     private User agentID;
 
@@ -33,11 +33,7 @@ public class Matching {
     private Instant matchingDate;
 
     @NotNull
-    @Column(name = "isRematch", nullable = false)
-    private Byte isRematch;
-
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "ticketingID", nullable = false)
     private Ticketing ticketingID;
 

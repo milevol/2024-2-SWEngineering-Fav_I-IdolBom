@@ -10,6 +10,8 @@ import ScheduleDetailScreen from './screens/ScheduleDetailScreen';
 import FindTicketAgentScreen from './screens/ticketing/FindTicketAgentScreen';
 import MatchTicketAgentScreen from './screens/ticketing/MatchTicketAgentScreen';
 import TicketScreen from './screens/ticketing/TicketScreen';
+import ChatListScreen from './screens/chat/ChatListScreen';
+import ChatScreen from './screens/chat/ChatScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -21,6 +23,7 @@ const MainTabs = () => {
       <Tab.Navigator tabBar={() => <BottomBar />}>
         <Tab.Screen name="Home" component={HomeStack} options={{ headerShown: false }} />
         <Tab.Screen name="Tickets" component={TicketStack} options={{ headerShown: false }} />
+        <Tab.Screen name="Chat" component={ChatStack} options={{ headerShown: false }} />
       </Tab.Navigator>
     </>
   );
@@ -41,6 +44,15 @@ const TicketStack = () => {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="TicketScreen" component={TicketScreen} />
+    </Stack.Navigator>
+  );
+};
+
+const ChatStack = () => {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="ChatListScreen" component={ChatListScreen} />
+      <Stack.Screen name="ChatScreen" component={ChatScreen} />
     </Stack.Navigator>
   );
 };

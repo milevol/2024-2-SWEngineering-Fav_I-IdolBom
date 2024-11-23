@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import java.util.Optional;
 
@@ -33,6 +34,51 @@ public class KakaoService {
     @Value("${kakao.redirect_uri}")
     private String redirectUri;
 
+    // Access Token 요청 메서드
+/*    public getTokenDTO getAccessTokenFromKakao(String code) throws JsonProcessingException {
+        String reqUrl = "https://kauth.kakao.com/oauth/token";
+        RestTemplate rt = new RestTemplate();
+
+        // HttpHeaders 객체
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+
+
+        // HttpBody 객체
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", clientId);
+        params.add("redirect_uri", redirectUri);
+        params.add("code", code);
+
+        // HttpEntity 객체 생성
+        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
+
+        // 디버깅 로그 추가 (수정됨)
+        log.info("Kakao Token Request URL: {}", reqUrl);
+        log.info("Headers: {}", headers);
+        log.info("Body: {}", params);
+
+        try {
+            // POST 방식으로 요청 보내기
+            ResponseEntity<String> response = rt.exchange(reqUrl, HttpMethod.POST, kakaoTokenRequest, String.class);
+
+            // 응답 디버깅 로그 추가 (수정됨)
+            log.info("Kakao Token Response Status: {}", response.getStatusCode());
+            log.info("Kakao Token Response Body: {}", response.getBody());
+
+            String responseBody = response.getBody();
+            ObjectMapper objectMapper = new ObjectMapper();
+            return objectMapper.readValue(responseBody, getTokenDTO.class);
+
+        } catch (HttpClientErrorException e) {
+            // 예외 로그 추가 (수정됨)
+            log.error("HttpClientErrorException occurred: {}", e.getMessage());
+            log.error("Response Body: {}", e.getResponseBodyAsString());
+            throw new RuntimeException("Kakao API 요청 실패: " + e.getMessage());
+        }
+    }*/
+    // 원본
     public getTokenDTO getAccessTokenFromKakao(String code) throws JsonProcessingException {
         String reqUrl = "https://kauth.kakao.com/oauth/token";
         RestTemplate rt = new RestTemplate();
@@ -48,11 +94,21 @@ public class KakaoService {
         params.add("redirect_uri", redirectUri);
         params.add("code", code);
 
+        // 추가: 로그 확인용
+        log.info("Kakao Token Request URL: {}", reqUrl);
+        log.info("Headers: {}", headers);
+        log.info("Body: {}", params);
+
         // HttpEntity 객체 생성
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
 
         // POST 방식으로 요청 보내기
         ResponseEntity<String> response = rt.exchange(reqUrl, HttpMethod.POST, kakaoTokenRequest, String.class);
+
+        // 추가:  디버깅 로그 : 카카오
+        log.info("Kakao Token Request URL: {}", reqUrl);
+        log.info("Headers: {}", headers);
+        log.info("Body: {}", params);
 
         String responseBody = response.getBody();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -72,15 +128,19 @@ public class KakaoService {
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoUserInfoRequest = new HttpEntity<>(headers);
         RestTemplate rt = new RestTemplate();
+
+        // request 확인용
+        log.info("Requesting Kakao User Info with Access Token: {}", accessToken);
         ResponseEntity<String> response = rt.exchange(
                 "https://kapi.kakao.com/v2/user/me",
-                HttpMethod.POST,
+                HttpMethod.GET,
                 kakaoUserInfoRequest,
                 String.class
         );
 
         // responseBody에 있는 정보 꺼내기
         String responseBody = response.getBody();
+        log.info("response body ----" + responseBody);
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonNode = objectMapper.readTree(responseBody);
 

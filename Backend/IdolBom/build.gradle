@@ -50,6 +50,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+
+// jboss-logging to resolve Hibernate dependency issues
+	implementation 'org.jboss.logging:jboss-logging:3.5.3.Final'
+
 }
 
 tasks.named('test') {

@@ -33,38 +33,45 @@ public class LoginController {
     @Autowired
     private TicketingService ticketingService;
 
-    // api with front (get code)
-    @GetMapping("/login")
-    public ResponseEntity<?> RegisterLogin(@RequestBody String code) throws IOException {
+
+    @GetMapping("/callback")
+    public ResponseEntity<?> handleCallback(@RequestParam("code") String code) {
         Map<String, Object> response = new LinkedHashMap<>();
-        User loginUser = new User();
-
+      
         try {
-            GetTokenDTO accessToken = loginService.getAccessTokenFromKakao(code);
-            KakaoUserDTO userInfo = loginService.getKakaoInfo(accessToken.getAccessToken());
+            log.info("GET Request Received. Authorization Code: {}", code);
+            // 카카오 토큰 요청
+            getTokenDTO accessToken = loginService.getAccessTokenFromKakao(code);
+
+            log.info("kakao accessToken : {}", accessToken);
+            // 사용자 정보 요청
+            kakaoUserDTO userInfo = loginService.getKakaoInfo(accessToken.getAccessToken());
             log.info(userInfo.toString());
+
+            // 사용자 등록
             loginService.register(userInfo);
+            session.setAttribute("userInfo", userInfo);
+            session.setMaxInactiveInterval(60 * 60 * 24); // 24시간
 
-            loginUser.setId(userInfo.getId());
-            loginUser.setUserName(userInfo.getNickname());
-            loginUser.setProfileImage(userInfo.getProfile_image());
-
-            session.setAttribute("userInfo", loginUser);
-            session.setMaxInactiveInterval(60 * 60 * 24);
-
+            // 응답 데이터 구성
             response.put("code", "SU");
-            response.put("message", "Success.");
-            response.put("loginUser", userInfo);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
+            response.put("message", "Success");
+            response.put("userInfo", userInfo);
+            response.put("authCode", code);
+
+            log.info("Response Data: {}", response);
+            return ResponseEntity.status(HttpStatus.OK).body(response); // 메타데이터 포함
         } catch (Exception e) {
+            log.error("Error during callback processing", e);
             response.put("code", "Error");
             response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-
     }
 
-    @GetMapping("/{idol_id}")
+
+
+    @GetMapping("/idol/{idol_id}")
     public ResponseEntity<?> setIdol(@PathVariable("idol_id") int idol_id) {
         Map<String, Object> response = new LinkedHashMap<>();
         Object currentUser = session.getAttribute("userInfo");

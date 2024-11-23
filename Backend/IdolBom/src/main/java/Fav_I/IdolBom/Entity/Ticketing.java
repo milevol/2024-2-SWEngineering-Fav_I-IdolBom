@@ -6,11 +6,13 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
 @Setter
 @RequiredArgsConstructor
 @Entity
+@RequiredArgsConstructor
 public class Ticketing {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,9 +42,10 @@ public class Ticketing {
 
     @NotNull
     @Column(name = "ticketingStatus", nullable = false, columnDefinition = "int default 0")
-    private int ticketingStatus;
+    private int ticketingStatus = 0;
 
     @NotNull
     @Column(name = "isRematch", nullable = false, columnDefinition = "int default 0")
     private Integer isRematch = 0;
+  
 }

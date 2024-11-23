@@ -33,7 +33,8 @@ public class LoginService {
     @Value("${kakao.redirect_uri}")
     private String redirectUri;
 
-    public GetTokenDTO getAccessTokenFromKakao(String code) throws JsonProcessingException {
+    // 원본
+    public getTokenDTO getAccessTokenFromKakao(String code) throws JsonProcessingException {
         String reqUrl = "https://kauth.kakao.com/oauth/token";
         RestTemplate rt = new RestTemplate();
 
@@ -48,20 +49,32 @@ public class LoginService {
         params.add("redirect_uri", redirectUri);
         params.add("code", code);
 
+        // 추가: 로그 확인용
+        log.info("Kakao Token Request URL: {}", reqUrl);
+        log.info("Headers: {}", headers);
+        log.info("Body: {}", params);
+
         // HttpEntity 객체 생성
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
 
         // POST 방식으로 요청 보내기
         ResponseEntity<String> response = rt.exchange(reqUrl, HttpMethod.POST, kakaoTokenRequest, String.class);
 
+
+        // 추가:  디버깅 로그 : 카카오
+        log.info("Kakao Token Request URL: {}", reqUrl);
+        log.info("Headers: {}", headers);
+        log.info("Body: {}", params);
+
         String responseBody = response.getBody();
         ObjectMapper objectMapper = new ObjectMapper();
-        GetTokenDTO authResponse = objectMapper.readValue(responseBody, GetTokenDTO.class);
+        getTokenDTO authResponse = objectMapper.readValue(responseBody, getTokenDTO.class);
 
         log.info("** Get Kakao Token Succeed.");
 
         return authResponse;
     }
+
 
     public KakaoUserDTO getKakaoInfo(String accessToken) throws JsonProcessingException {
         // HTTP Header 생성
@@ -72,9 +85,12 @@ public class LoginService {
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoUserInfoRequest = new HttpEntity<>(headers);
         RestTemplate rt = new RestTemplate();
+
+        // request 확인용
+        log.info("Requesting Kakao User Info with Access Token: {}", accessToken);
         ResponseEntity<String> response = rt.exchange(
                 "https://kapi.kakao.com/v2/user/me",
-                HttpMethod.POST,
+                HttpMethod.GET,
                 kakaoUserInfoRequest,
                 String.class
         );
@@ -97,6 +113,7 @@ public class LoginService {
                 .nickname(nickname)
                 .build();
     }
+
 
     public Optional<User> register(KakaoUserDTO kakaoUserDTO) {
         Long id = kakaoUserDTO.getId();
@@ -121,4 +138,5 @@ public class LoginService {
     public User getMyInfo(Long id) {
         return userRepository.findById(id).orElse(null);
     }
+
 }

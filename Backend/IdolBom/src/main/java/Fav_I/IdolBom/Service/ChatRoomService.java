@@ -1,7 +1,7 @@
 package Fav_I.IdolBom.Service;
 
 import Fav_I.IdolBom.Config.RedisConfig;
-import Fav_I.IdolBom.Config.RedisSubscriber;
+import Fav_I.IdolBom.Websocket.RedisSubscriber;
 import Fav_I.IdolBom.DTO.ChatRoomListGetResponse;
 import Fav_I.IdolBom.DTO.MessageSubDTO;
 import Fav_I.IdolBom.Entity.ChatRoom;

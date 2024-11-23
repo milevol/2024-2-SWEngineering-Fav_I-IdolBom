@@ -1,6 +1,6 @@
 package Fav_I.IdolBom.Controller;
 
-import Fav_I.IdolBom.Config.MessagePublisher;
+import Fav_I.IdolBom.Websocket.MessagePublisher;
 import Fav_I.IdolBom.DTO.ChatMessageDTO;
 import Fav_I.IdolBom.DTO.ChatRoomListGetResponse;
 import Fav_I.IdolBom.Entity.ChatRoom;
@@ -36,7 +36,7 @@ public class ChatController {
     private UserRepository userRepository;
 
     @MessageMapping("/send") // 클라이언트에서 /pub/send로 메시지를 보내면
-    @SendTo("/sub/chat_{chatRoomID}")  // /sub/chat로 메시지를 보낸다
+    @SendTo("/sub/chat/{chatRoomID}")  // /sub/chat로 메시지를 보낸다
     public ChatMessageDTO sendMessage(ChatMessageDTO message) {
         String channelName = "chat_" + message.getChatRoomID();
         messagePublisher.publish(channelName, message.getContent());

@@ -1,4 +1,4 @@
-package Fav_I.IdolBom.Config;
+package Fav_I.IdolBom.Websocket;
 
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;

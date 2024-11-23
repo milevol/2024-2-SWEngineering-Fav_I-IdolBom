@@ -1,4 +1,4 @@
-package Fav_I.IdolBom.Config;
+package Fav_I.IdolBom.Websocket;
 
 import Fav_I.IdolBom.DTO.ChatMessageDTO;
 import Fav_I.IdolBom.DTO.ChatRoomListGetResponse;

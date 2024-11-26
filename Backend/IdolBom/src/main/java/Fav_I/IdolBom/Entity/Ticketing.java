@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 @Setter
 @RequiredArgsConstructor
 @Entity
-@RequiredArgsConstructor
 public class Ticketing {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

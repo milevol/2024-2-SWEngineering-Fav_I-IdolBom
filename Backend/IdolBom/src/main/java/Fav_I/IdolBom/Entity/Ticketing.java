@@ -4,13 +4,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @Setter
-@Entity
 @RequiredArgsConstructor
+@Entity
 public class Ticketing {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,12 +19,12 @@ public class Ticketing {
     private Integer id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "applicantID", nullable = false)
     private User applicantID;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "scheduleID", nullable = false)
     private Schedule scheduleID;
 
@@ -39,7 +40,11 @@ public class Ticketing {
     private String requestMessage;
 
     @NotNull
-    @Column(name = "ticketingStatus", nullable = false)
-    private int ticketingStatus; // 수정될 수 있음 
+    @Column(name = "ticketingStatus", nullable = false, columnDefinition = "int default 0")
+    private int ticketingStatus = 0;
 
+    @NotNull
+    @Column(name = "isRematch", nullable = false, columnDefinition = "int default 0")
+    private Integer isRematch = 0;
+  
 }

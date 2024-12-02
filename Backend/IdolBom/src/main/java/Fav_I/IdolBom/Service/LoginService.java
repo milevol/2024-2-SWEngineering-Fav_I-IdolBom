@@ -1,7 +1,7 @@
 package Fav_I.IdolBom.Service;
 
-import Fav_I.IdolBom.DTO.getTokenDTO;
-import Fav_I.IdolBom.DTO.kakaoUserDTO;
+import Fav_I.IdolBom.DTO.GetTokenDTO;
+import Fav_I.IdolBom.DTO.KakaoUserDTO;
 import Fav_I.IdolBom.Entity.User;
 import Fav_I.IdolBom.Repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -23,7 +23,7 @@ import java.util.Optional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class KakaoService {
+public class LoginService {
 
     private final UserRepository userRepository;
 
@@ -33,7 +33,8 @@ public class KakaoService {
     @Value("${kakao.redirect_uri}")
     private String redirectUri;
 
-    public getTokenDTO getAccessTokenFromKakao(String code) throws JsonProcessingException {
+    // 원본
+    public GetTokenDTO getAccessTokenFromKakao(String code) throws JsonProcessingException {
         String reqUrl = "https://kauth.kakao.com/oauth/token";
         RestTemplate rt = new RestTemplate();
 
@@ -48,22 +49,34 @@ public class KakaoService {
         params.add("redirect_uri", redirectUri);
         params.add("code", code);
 
+        // 추가: 로그 확인용
+        log.info("Kakao Token Request URL: {}", reqUrl);
+        log.info("Headers: {}", headers);
+        log.info("Body: {}", params);
+
         // HttpEntity 객체 생성
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(params, headers);
 
         // POST 방식으로 요청 보내기
         ResponseEntity<String> response = rt.exchange(reqUrl, HttpMethod.POST, kakaoTokenRequest, String.class);
 
+
+        // 추가:  디버깅 로그 : 카카오
+        log.info("Kakao Token Request URL: {}", reqUrl);
+        log.info("Headers: {}", headers);
+        log.info("Body: {}", params);
+
         String responseBody = response.getBody();
         ObjectMapper objectMapper = new ObjectMapper();
-        getTokenDTO authResponse = objectMapper.readValue(responseBody, getTokenDTO.class);
+        GetTokenDTO authResponse = objectMapper.readValue(responseBody, GetTokenDTO.class);
 
         log.info("** Get Kakao Token Succeed.");
 
         return authResponse;
     }
 
-    public kakaoUserDTO getKakaoInfo(String accessToken) throws JsonProcessingException {
+
+    public KakaoUserDTO getKakaoInfo(String accessToken) throws JsonProcessingException {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
@@ -72,9 +85,12 @@ public class KakaoService {
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoUserInfoRequest = new HttpEntity<>(headers);
         RestTemplate rt = new RestTemplate();
+
+        // request 확인용
+        log.info("Requesting Kakao User Info with Access Token: {}", accessToken);
         ResponseEntity<String> response = rt.exchange(
                 "https://kapi.kakao.com/v2/user/me",
-                HttpMethod.POST,
+                HttpMethod.GET,
                 kakaoUserInfoRequest,
                 String.class
         );
@@ -91,14 +107,15 @@ public class KakaoService {
                 .get("nickname").asText();
 
         log.info("** Get Kakao User Info Succeed.");
-        return kakaoUserDTO.builder()
+        return KakaoUserDTO.builder()
                 .id(id)
                 .profile_image(profile_image)
                 .nickname(nickname)
                 .build();
     }
 
-    public Optional<User> register(kakaoUserDTO kakaoUserDTO) {
+
+    public Optional<User> register(KakaoUserDTO kakaoUserDTO) {
         Long id = kakaoUserDTO.getId();
         Optional<User> userInfo = userRepository.findById(id);
 
@@ -117,4 +134,9 @@ public class KakaoService {
     public void setIdol(User user, int idol_id) {
         userRepository.setIdol(user.getId(), idol_id);
     }
+
+    public User getMyInfo(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
 }

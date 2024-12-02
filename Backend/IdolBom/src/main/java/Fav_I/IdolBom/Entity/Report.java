@@ -13,6 +13,7 @@ import java.time.Instant;
 @Entity
 public class Report {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "reportID", nullable = false)
     private Integer id;
 
@@ -45,5 +46,4 @@ public class Report {
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "reportedUserID", nullable = false)
     private User reportedUserID;
-
 }

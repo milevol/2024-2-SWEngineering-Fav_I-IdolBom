@@ -11,3 +11,4 @@ INSERT INTO Schedule (scheduleID, idolID, scheduleName, scheduleDate, originUrl,
                                                                                                                          (3, 1, '아티스트 임영웅 리사이틀 공연', '2024-12-27 19:30:00', 'https://ticket.interpark.com/webzine/paper/TPNoticeView.asp?bbsno=34&no=53378', '콘서트', '고척스카이돔', 1),
                                                                                                                          (4, 1, '아티스트 임영웅 리사이틀 공연', '2024-12-28 17:00:00', 'https://ticket.interpark.com/webzine/paper/TPNoticeView.asp?bbsno=34&no=53378', '콘서트', '고척스카이돔', 1),
                                                                                                                          (5, 1, '임영웅 아임 히어로 더 스타디움 연애편지 공개!', '2024-11-04 08:00:00', 'https://x.com/limyoungwoong/status/1853210865207759202', '영화', null, 0);
+

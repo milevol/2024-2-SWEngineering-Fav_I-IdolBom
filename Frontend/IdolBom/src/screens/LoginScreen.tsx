@@ -1,42 +1,79 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import { WebView } from 'react-native-webview';
+import { KAKAO_REST_API_KEY, REDIRECT_URI, BACKEND_URL } from '@env';
+import CookieManager from '@react-native-cookies/cookies';
 import { useNavigation } from '@react-navigation/native';
 
-
-// @env에서 환경 변수를 가져옴
-import { KAKAO_REST_API_KEY, REDIRECT_URI } from '@env';
-
 const LoginScreen = () => {
-  const CLIENT_ID = KAKAO_REST_API_KEY; // .env에서 가져온 값
-  const REDIRECT_URL = REDIRECT_URI;   // .env에서 가져온 값
+  const CLIENT_ID = KAKAO_REST_API_KEY;
+  const REDIRECT_URL = REDIRECT_URI;
 
   const [showWebView, setShowWebView] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
 
-  const handleLogin = () => {
-    console.log("Login Button Pressed. Showing WebView...");
-    setShowWebView(true); // WebView를 보여줌
+  const clearWebViewCookiesAndCache = async () => {
+    try {
+      await CookieManager.clearAll();
+      console.log('WebView cookies cleared');
+    } catch (error) {
+      console.error('Error clearing WebView cookies: ', error);
+    }
   };
 
-  const handleWebViewMessage = async (event: any) => {
-    try {
-      const data = JSON.parse(event.nativeEvent.data); // WebView에서 전달된 JSON 데이터 파싱
-      console.log("Message from WebView: ", data);
+  const handleLogin = async () => {
+    console.log('Login Button Pressed. Clearing cookies and cache. Showing WebView...');
+    await clearWebViewCookiesAndCache();
+    setShowWebView(true);
+  };
 
-      // 서버 응답 처리: code === "SU" 일 경우 HomeScreen으로 이동
-      if (data.code === "SU") {
-        console.log("Success! Navigating to HomeScreen...");
-        navigation.navigate('Home', { authCode: data.authCode }); // HomeScreen으로 이동
-      } else {
-        Alert.alert("로그인 실패", `백엔드 오류: ${data.message || "응답 데이터 없음"}`);
+  const handleNavigationStateChange = (event) => {
+    if (event.url.startsWith(REDIRECT_URL)) {
+      const urlParams = new URLSearchParams(event.url.split('?')[1]);
+      const code = urlParams.get('code');
+      console.log('Authorization Code:', code);
+
+      if (code) {
+        setLoading(true);
+
+        // 인가 코드를 백엔드로 전달
+        fetch(`${BACKEND_URL}/auth/callback`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ code }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.code === 'SU') {
+              console.log('Login Successful:', data);
+
+              // Home 화면으로 이동
+              navigation.navigate('Home', {
+                userInfo: data.userInfo, // userInfo 객체 전달
+              });
+            } /* else {
+              Alert.alert('로그인 실패', data.message || '알 수 없는 오류');
+            } */
+          })
+          /* .catch((error) => {
+            console.error('Fetch Error:', error);
+            Alert.alert('로그인 실패', '백엔드 요청 중 문제가 발생했습니다.');
+          })
+          .finally(() => {
+            setLoading(false);
+            setShowWebView(false);
+          }); */
       }
-    } catch (error) {
-      console.error("Error parsing WebView message: ", error);
-      Alert.alert("로그인 실패", "WebView 데이터 처리 중 문제가 발생했습니다.");
-    } finally {
-      setLoading(false); // 로딩 종료
     }
   };
 
@@ -50,21 +87,11 @@ const LoginScreen = () => {
       {showWebView ? (
         <WebView
           source={{
-            uri: `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`,
+            uri: `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URL}&response_type=code`,
           }}
-          onMessage={handleWebViewMessage} // WebView에서 메시지 처리
-          startInLoadingState={true}
-          injectedJavaScript={`
-            // WebView 내부에서 데이터를 전송
-            if (window.location.href.includes("${REDIRECT_URI}")) {
-              const response = {
-                code: "SU",
-                message: "Authorization Code Received",
-                authCode: "exampleAuthCode"
-              };
-              window.ReactNativeWebView.postMessage(JSON.stringify(response));
-            }
-          `}
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
+          onNavigationStateChange={handleNavigationStateChange}
         />
       ) : (
         <View style={styles.loginContainer}>
@@ -101,6 +128,7 @@ const styles = StyleSheet.create({
   loginButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#000',
   },
   loadingOverlay: {
     position: 'absolute',

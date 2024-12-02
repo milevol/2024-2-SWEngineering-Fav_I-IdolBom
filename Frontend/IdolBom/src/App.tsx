@@ -11,7 +11,7 @@ const App = () => {
     <NavigationContainer>
       <Stack.Navigator
         initialRouteName="Login"
-        screenOptions={{ headerShown: false }} // 헤더를 숨기려면 추가
+        screenOptions={{ headerShown: false }} // 헤더 숨김
       >
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />

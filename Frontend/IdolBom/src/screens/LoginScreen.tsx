@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import {
   View,
-  Text,
+  Image,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
@@ -35,7 +34,7 @@ const LoginScreen = () => {
     setShowWebView(true);
   };
 
-  const handleNavigationStateChange = (event) => {
+  const handleNavigationStateChange = (event: any) => {
     if (event.url.startsWith(REDIRECT_URL)) {
       const urlParams = new URLSearchParams(event.url.split('?')[1]);
       const code = urlParams.get('code');
@@ -44,7 +43,6 @@ const LoginScreen = () => {
       if (code) {
         setLoading(true);
 
-        // 인가 코드를 백엔드로 전달
         fetch(`${BACKEND_URL}/auth/callback`, {
           method: 'POST',
           headers: {
@@ -56,23 +54,18 @@ const LoginScreen = () => {
           .then((data) => {
             if (data.code === 'SU') {
               console.log('Login Successful:', data);
-
-              // Home 화면으로 이동
               navigation.navigate('Home', {
-                userInfo: data.userInfo, // userInfo 객체 전달
+                userInfo: data.userInfo,
               });
-            } /* else {
-              Alert.alert('로그인 실패', data.message || '알 수 없는 오류');
-            } */
+            }
           })
-          /* .catch((error) => {
+          .catch((error) => {
             console.error('Fetch Error:', error);
-            Alert.alert('로그인 실패', '백엔드 요청 중 문제가 발생했습니다.');
           })
           .finally(() => {
             setLoading(false);
             setShowWebView(false);
-          }); */
+          });
       }
     }
   };
@@ -95,9 +88,12 @@ const LoginScreen = () => {
         />
       ) : (
         <View style={styles.loginContainer}>
-          <Text style={styles.title}>카카오 로그인</Text>
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Text style={styles.loginButtonText}>로그인</Text>
+          <Image source={require('../assets/images/IdolBomLogo.png')} style={styles.logo} />
+          <TouchableOpacity onPress={handleLogin}>
+            <Image
+              source={require('../assets/images/kakao_login_large_narrow.png')}
+              style={styles.kakaoLoginButton}
+            />
           </TouchableOpacity>
         </View>
       )}
@@ -108,28 +104,29 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#FFFFFF',
   },
   loginContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+  logo: {
+    width: 200,
+    height: 200,
+    marginBottom: -50,
+    resizeMode: 'contain',
   },
-  loginButton: {
-    backgroundColor: '#FFEB00',
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 40,
+  kakaoLoginButton: {
+    width: 343,
+    height: 70,
+    borderRadius : 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  loginButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#000',
-  },
+  imageStyle: {
+      borderRadius: 20, // Image의 borderRadius는 imageStyle에서 처리
+   },
   loadingOverlay: {
     position: 'absolute',
     top: 0,
@@ -140,6 +137,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+
 });
 
 export default LoginScreen;

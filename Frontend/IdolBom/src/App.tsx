@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import TopBar from './components/common/TopBar';
 import BottomBar from './components/common/BottomBar';
 import Header from './components/common/Header';
+import ChooseIdolManyScreen from './screens/choose/ChooseIdolManyScreen';
 import HomeScreen from './screens/HomeScreen';
 import ScheduleDetailScreen from './screens/ScheduleDetailScreen';
 import FindTicketAgentScreen from './screens/ticketing/FindTicketAgentScreen';
@@ -103,10 +104,12 @@ const ChatStack = () => {
   );
 };
 
+
 export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Choose" component={ChooseIdolManyScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Main" component={MainTabs} />
       </Stack.Navigator>

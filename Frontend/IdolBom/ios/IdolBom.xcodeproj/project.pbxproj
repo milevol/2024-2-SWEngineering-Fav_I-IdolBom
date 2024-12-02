@@ -14,6 +14,13 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7699B88040F8A987B510C191 /* libPods-IdolBom-IdolBomTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-IdolBom-IdolBomTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		A016C787098245B09C9A1B29 /* NanumSquareRoundB.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 298147E7BC83452E888DD536 /* NanumSquareRoundB.ttf */; };
+		CCC5573761954F96A99F3826 /* NanumSquareRoundEB.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C72F422AE32240FD9CC842D2 /* NanumSquareRoundEB.ttf */; };
+		D1667E8E4F0043A49E617B40 /* NanumSquareRoundL.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A7BFEB4B88154D0FADD53465 /* NanumSquareRoundL.ttf */; };
+		81594B43112C4AF3A1DA2B60 /* NanumSquareRoundR.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 297D7D14A5314AB0B11765AA /* NanumSquareRoundR.ttf */; };
+		A699621B874249BABA8504AF /* Yeongdo-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 24E125BE13E8481D9D4B18F8 /* Yeongdo-Bold.ttf */; };
+		BAF6231B05A74B37B605C3FC /* Yeongdo-Heavy.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 17470219E5A8460DBAAA4C35 /* Yeongdo-Heavy.ttf */; };
+		3B81BD37402E42379E5989CE /* Yeongdo-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B32EA21C8DAF41D8A3C9700F /* Yeongdo-Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +52,13 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = IdolBom/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-IdolBom-IdolBomTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IdolBom-IdolBomTests.release.xcconfig"; path = "Target Support Files/Pods-IdolBom-IdolBomTests/Pods-IdolBom-IdolBomTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		298147E7BC83452E888DD536 /* NanumSquareRoundB.ttf */ = {isa = PBXFileReference; name = "NanumSquareRoundB.ttf"; path = "../src/assets/fonts/NanumSquareRoundB.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		C72F422AE32240FD9CC842D2 /* NanumSquareRoundEB.ttf */ = {isa = PBXFileReference; name = "NanumSquareRoundEB.ttf"; path = "../src/assets/fonts/NanumSquareRoundEB.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		A7BFEB4B88154D0FADD53465 /* NanumSquareRoundL.ttf */ = {isa = PBXFileReference; name = "NanumSquareRoundL.ttf"; path = "../src/assets/fonts/NanumSquareRoundL.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		297D7D14A5314AB0B11765AA /* NanumSquareRoundR.ttf */ = {isa = PBXFileReference; name = "NanumSquareRoundR.ttf"; path = "../src/assets/fonts/NanumSquareRoundR.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		24E125BE13E8481D9D4B18F8 /* Yeongdo-Bold.ttf */ = {isa = PBXFileReference; name = "Yeongdo-Bold.ttf"; path = "../src/assets/fonts/Yeongdo-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		17470219E5A8460DBAAA4C35 /* Yeongdo-Heavy.ttf */ = {isa = PBXFileReference; name = "Yeongdo-Heavy.ttf"; path = "../src/assets/fonts/Yeongdo-Heavy.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		B32EA21C8DAF41D8A3C9700F /* Yeongdo-Regular.ttf */ = {isa = PBXFileReference; name = "Yeongdo-Regular.ttf"; path = "../src/assets/fonts/Yeongdo-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +138,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				B7694D9B726247D19FB46E22 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -149,6 +164,21 @@
 			);
 			path = Pods;
 			sourceTree = "<group>";
+		};
+		B7694D9B726247D19FB46E22 /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				298147E7BC83452E888DD536 /* NanumSquareRoundB.ttf */,
+				C72F422AE32240FD9CC842D2 /* NanumSquareRoundEB.ttf */,
+				A7BFEB4B88154D0FADD53465 /* NanumSquareRoundL.ttf */,
+				297D7D14A5314AB0B11765AA /* NanumSquareRoundR.ttf */,
+				24E125BE13E8481D9D4B18F8 /* Yeongdo-Bold.ttf */,
+				17470219E5A8460DBAAA4C35 /* Yeongdo-Heavy.ttf */,
+				B32EA21C8DAF41D8A3C9700F /* Yeongdo-Regular.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -245,6 +275,13 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				A016C787098245B09C9A1B29 /* NanumSquareRoundB.ttf in Resources */,
+				CCC5573761954F96A99F3826 /* NanumSquareRoundEB.ttf in Resources */,
+				D1667E8E4F0043A49E617B40 /* NanumSquareRoundL.ttf in Resources */,
+				81594B43112C4AF3A1DA2B60 /* NanumSquareRoundR.ttf in Resources */,
+				A699621B874249BABA8504AF /* Yeongdo-Bold.ttf in Resources */,
+				BAF6231B05A74B37B605C3FC /* Yeongdo-Heavy.ttf in Resources */,
+				3B81BD37402E42379E5989CE /* Yeongdo-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

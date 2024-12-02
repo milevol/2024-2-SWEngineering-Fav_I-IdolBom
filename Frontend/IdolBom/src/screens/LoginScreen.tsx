@@ -54,9 +54,12 @@ const LoginScreen = () => {
           .then((data) => {
             if (data.code === 'SU') {
               console.log('Login Successful:', data);
-              navigation.navigate('Home', {
+
+              navigation.navigate('Main', { screen: 'Home' });
+
+             /*  navigation.navigate('Home', {
                 userInfo: data.userInfo,
-              });
+              }); */
             }
           })
           .catch((error) => {

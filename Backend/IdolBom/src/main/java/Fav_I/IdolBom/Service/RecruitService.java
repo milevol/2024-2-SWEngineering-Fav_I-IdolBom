@@ -1,15 +1,29 @@
 package Fav_I.IdolBom.Service;
 
+import Fav_I.IdolBom.Entity.ParticipantList;
+import Fav_I.IdolBom.Entity.User;
+import Fav_I.IdolBom.Repository.ParticipantListRepository;
+import Fav_I.IdolBom.Repository.ScheduleRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import Fav_I.IdolBom.DTO.RecruitDTO;
 import Fav_I.IdolBom.Repository.RecruitRepository;
 import Fav_I.IdolBom.Entity.Recruitment;
 
+import java.util.List;
+
 @Service
+@RequiredArgsConstructor
 public class RecruitService {
-    @Autowired
-    private RecruitRepository recruitRepository;
+    private final RecruitRepository recruitRepository;
+    private final ScheduleRepository scheduleRepository;
+    private final ParticipantListRepository participantListRepository;
+
+    public List<Recruitment> getRecruitList() {
+        return recruitRepository.findAll();
+    }
 
     public void createRecruit(RecruitDTO recruitDTO) {
         Recruitment recruit = new Recruitment();
@@ -17,19 +31,29 @@ public class RecruitService {
         recruit.setStartDate(recruitDTO.getStartDate());
         recruit.setExpiredDate(recruitDTO.getExpiredDate());
         recruit.setMaxParticipants(recruitDTO.getMaxParticipants());
-        //recruit.setCurrentParticipants(recruitDTO.getCurrentParticipants());
-        //recruit.setStatus(recruitDTO.getStatus());
+        recruit.setCurrentParticipants(1); // Creator 1명
+        recruit.setStatus((byte) 0); // 상태 : 모집 진행중
         recruit.setGenderPreference(recruitDTO.getGenderPreference());
         recruit.setAgePreference(recruitDTO.getAgePreference());
         recruit.setLocationPreference(recruitDTO.getLocationPreference());
         recruit.setAdditionalNote(recruitDTO.getAdditionalNote());
+        User creator = recruitDTO.getCreatorID();
+        recruit.setCreatorID(creator);
+        recruit.setScheduleID(scheduleRepository.findById(recruitDTO.getScheduleID()).get());
 
-        // Creator와 ScheduleID를 각각 User와 Schedule 엔티티에서 조회하여 설정 필요
-        recruit.setCreatorID(recruitDTO.getCreatorID());
-        recruit.setScheduleID(recruitDTO.getScheduleID());
+        Recruitment created = recruitRepository.save(recruit);
 
-        recruitRepository.save(recruit);
-
+        ParticipantList participantList = new ParticipantList();
+        participantList.setUserID(creator);
+        participantList.setRecruitmentID(created);
+        participantListRepository.save(participantList);
     }
 
+    public void updateRecruit(User loginUser, int recruit_id) {
+        Recruitment recruit = recruitRepository.findById(recruit_id).get();
+        ParticipantList to_update = new ParticipantList();
+        to_update.setUserID(loginUser);
+        to_update.setRecruitmentID(recruit);
+        participantListRepository.save(to_update);
+    }
 }

@@ -18,19 +18,5 @@ public class RecruitDTO {
     private String agePreference;
     private String locationPreference;
     private String additionalNote;
-    private Schedule scheduleID;
-
-    public RecruitDTO() {
-    }
-
-    public RecruitDTO(String title, Instant startDate, Instant expiredDate, User creatorID, Integer maxParticipants, String genderPreference, String agePreference, String locationPreference) {
-        this.title = title;
-        this.startDate = startDate;
-        this.expiredDate = expiredDate;
-        this.creatorID = creatorID;
-        this.maxParticipants = maxParticipants;
-        this.genderPreference = genderPreference;
-        this.agePreference = agePreference;
-        this.locationPreference = locationPreference;
-    }
+    private Integer scheduleID;
 }

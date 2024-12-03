@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ScrollView } from 'react-native';
 import styled from 'styled-components/native';
+import { useNavigation } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 
 import ChanwonImage from '../../assets/images/chanwon.svg';
@@ -12,7 +13,6 @@ import YoungungImage from '../../assets/images/youngung.svg';
 import OneImage from '../../assets/images/1.svg';
 import TwoImage from '../../assets/images/2.svg';
 import ThreeImage from '../../assets/images/3.svg';
-
 
 const idols = [
   { name: '이찬원', image: ChanwonImage },
@@ -28,9 +28,18 @@ const idols = [
 
 export default function IdolSelection() {
   const [selectedIdol, setSelectedIdol] = useState(null);
+  const navigation = useNavigation(); // Navigation 객체 가져오기
 
   const handleSelect = (idol) => {
     setSelectedIdol(idol);
+  };
+
+  const handleConfirmSelection = () => {
+    if (selectedIdol) {
+      navigation.navigate('Main', { screen: 'Home' }); // HomeScreen으로 이동
+    } else {
+      alert('아이돌을 선택해주세요!'); // 선택하지 않았을 경우 경고
+    }
   };
 
   return (
@@ -43,9 +52,9 @@ export default function IdolSelection() {
             height="100%"
             preserveAspectRatio="xMidYMid slice"
             style={{
-                  position: 'absolute',
-                  opacity: 0.5,
-                }}
+              position: 'absolute',
+              opacity: 0.5,
+            }}
           />
 
           {/* 상단 그라데이션 */}
@@ -78,15 +87,15 @@ export default function IdolSelection() {
               isSelected={selectedIdol?.name === idol.name}
             >
               <IdolImage isSelected={selectedIdol?.name === idol.name}>
-                  <idol.image width="110" height="110" />
-                </IdolImage>
-                <IdolName>{idol.name}</IdolName>
+                <idol.image width="110" height="110" />
+              </IdolImage>
+              <IdolName>{idol.name}</IdolName>
             </IdolButton>
           ))}
         </IdolGrid>
       </ScrollView>
       {selectedIdol && <SelectedIdol>{selectedIdol.name}</SelectedIdol>}
-      <SelectButton>
+      <SelectButton onPress={handleConfirmSelection}>
         <ButtonText>선택하기</ButtonText>
       </SelectButton>
     </Container>
@@ -171,7 +180,6 @@ const IdolImage = styled.View`
   border-color: ${(props) => (props.isSelected ? '#3E95FF' : 'transparent')};
 `;
 
-
 const IdolName = styled.Text`
   margin-top: 5px;
   font-family: 'NanumSquareRoundR';
@@ -207,5 +215,3 @@ const ButtonText = styled.Text`
   font-size: 20px;
   color: #fff;
 `;
-
-

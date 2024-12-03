@@ -49,8 +49,18 @@ public class RecruitService {
         participantListRepository.save(participantList);
     }
 
-    public void updateRecruit(User loginUser, int recruit_id) {
+    public void updateRecruit(User loginUser, int recruit_id) throws Exception {
         Recruitment recruit = recruitRepository.findById(recruit_id).get();
+        if (recruit.getCurrentParticipants() == recruit.getMaxParticipants()) {
+            throw new Exception("max participants");
+        }
+        recruit.setCurrentParticipants(recruit.getCurrentParticipants() + 1); // 동행 인원 추가
+        if (recruit.getCurrentParticipants().equals(recruit.getMaxParticipants())) {
+            recruit.setStatus((byte) 1); // 한명 추가해서 풀방됨.
+        }
+        recruitRepository.save(recruit);
+        
+        // ParticipantList에 추가
         ParticipantList to_update = new ParticipantList();
         to_update.setUserID(loginUser);
         to_update.setRecruitmentID(recruit);

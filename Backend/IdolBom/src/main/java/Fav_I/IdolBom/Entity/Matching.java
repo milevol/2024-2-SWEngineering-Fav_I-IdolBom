@@ -29,7 +29,7 @@ public class Matching {
 
     @NotNull
     @Column(name = "matchingStatus", nullable = false, columnDefinition = "int default 1")
-    private Byte matchingStatus = 1;
+    private Integer matchingStatus = 1;
 
     @Column(name = "matchingDate")
     @CreationTimestamp

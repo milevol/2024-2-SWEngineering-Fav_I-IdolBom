@@ -59,7 +59,7 @@ public class RecruitService {
             recruit.setStatus((byte) 1); // 한명 추가해서 풀방됨.
         }
         recruitRepository.save(recruit);
-        
+
         // ParticipantList에 추가
         ParticipantList to_update = new ParticipantList();
         to_update.setUserID(loginUser);

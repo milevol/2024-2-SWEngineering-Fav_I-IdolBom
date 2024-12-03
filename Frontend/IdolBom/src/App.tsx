@@ -15,6 +15,7 @@ import TicketScreen from './screens/ticketing/TicketScreen';
 import ChatListScreen from './screens/chat/ChatListScreen';
 import ChatScreen from './screens/chat/ChatScreen';
 import LoginScreen from './screens/LoginScreen';
+import ReportScreen from './screens/report/ReportScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -109,10 +110,24 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Choose" component={ChooseIdolManyScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
+        {/* Login이나 선택 화면은 필요한 경우 다시 활성화 */}
+        {/* <Stack.Screen name="Login" component={LoginScreen} /> */}
+        {/* <Stack.Screen name="Choose" component={ChooseIdolManyScreen} /> */}
+
+        {/* MainTabs는 BottomBar를 포함한 네비게이션 */}
         <Stack.Screen name="Main" component={MainTabs} />
+
+        {/* ReportScreen은 별도로 분리되어 BottomBar 없이 렌더링 */}
+        <Stack.Screen
+          name="ReportScreen"
+          component={ReportScreen}
+          options={{
+            header: () => <Header title="" />, // Header 렌더링
+            headerShown: true,
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
+

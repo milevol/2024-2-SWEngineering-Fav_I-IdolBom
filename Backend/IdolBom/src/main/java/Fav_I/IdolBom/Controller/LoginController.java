@@ -34,10 +34,11 @@ public class LoginController {
     private TicketingService ticketingService;
 
 
-    @GetMapping("/callback")
-    public ResponseEntity<?> handleCallback(@RequestParam("code") String code) {
+    @PostMapping("/auth/callback")
+    public ResponseEntity<?> handleCallback(@RequestBody Map<String, String> requestBody) {
         Map<String, Object> response = new LinkedHashMap<>();
-      
+        String code = requestBody.get("code");
+
         try {
             log.info("GET Request Received. Authorization Code: {}", code);
             // 카카오 토큰 요청

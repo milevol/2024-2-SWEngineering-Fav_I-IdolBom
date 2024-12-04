@@ -13,6 +13,7 @@ import Fav_I.IdolBom.DTO.RecruitDTO;
 import Fav_I.IdolBom.Repository.RecruitRepository;
 import Fav_I.IdolBom.Entity.Recruitment;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -30,7 +31,7 @@ public class RecruitService {
     public void createRecruit(RecruitDTO recruitDTO) {
         Recruitment recruit = new Recruitment();
         recruit.setTitle(recruitDTO.getTitle());
-        recruit.setStartDate(recruitDTO.getStartDate());
+        recruit.setStartDate(LocalDate.from(recruitDTO.getStartDate()));
         recruit.setExpiredDate(recruitDTO.getExpiredDate());
         recruit.setMaxParticipants(recruitDTO.getMaxParticipants());
         recruit.setCurrentParticipants(1); // Creator 1명

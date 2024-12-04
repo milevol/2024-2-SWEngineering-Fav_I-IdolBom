@@ -16,7 +16,7 @@ public class ParticipantListId implements java.io.Serializable {
     private static final long serialVersionUID = 8625574425690214356L;
     @NotNull
     @Column(name = "userID", nullable = false)
-    private Integer userID;
+    private Long userID;
 
     @NotNull
     @Column(name = "recruitmentID", nullable = false)

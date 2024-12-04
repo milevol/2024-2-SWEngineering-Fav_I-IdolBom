@@ -20,18 +20,18 @@ const LoginScreen = () => {
   const navigation = useNavigation();
   const [isProcessing, setIsProcessing] = useState(false);//
 
-  const clearWebViewCookiesAndCache = async () => {
+/*   const clearWebViewCookiesAndCache = async () => {
     try {
       await CookieManager.clearAll();
       console.log('WebView cookies cleared');
     } catch (error) {
       console.error('Error clearing WebView cookies: ', error);
-    }
-  };
+    }닏ㄷㄴ
+  }; */
 
   const handleLogin = async () => {
     console.log('Login Button Pressed. Clearing cookies and cache. Showing WebView...');
-    await clearWebViewCookiesAndCache();
+    //await clearWebViewCookiesAndCache();
     setShowWebView(true);
   };
 
@@ -55,7 +55,6 @@ const LoginScreen = () => {
             .then(async response => {
                 const text = await response.text(); // 응답을 텍스트로 먼저 받기
                 console.log('Server Response:', text); // 실제 응답 내용 확인
-
 
                 try {
                     const data = JSON.parse(text); // 텍스트를 JSON으로 파싱

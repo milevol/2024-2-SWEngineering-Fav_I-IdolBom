@@ -1,29 +1,7 @@
-// ThreeDaysSchedule.tsx
-// 홈화면에서 어제/오늘/내일 스케줄
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-
-// 임시 데이터
-const schedules = {
-  yesterday: [
-    { time: "오후 2:00", title: "스케줄 제목", details: "스케줄 날짜, 장소" },
-    { time: "오후 2:00", title: "스케줄 제목", details: "스케줄 날짜, 장소" },
-    { time: "오후 2:00", title: "스케줄 제목", details: "스케줄 날짜, 장소" },
-  ],
-  today: [
-    { time: "오후 2:00", title: "스케줄 제목", details: "스케줄 날짜, 장소" },
-    { time: "오후 2:00", title: "스케줄 제목", details: "스케줄 날짜, 장소" },
-    { time: "오후 2:00", title: "스케줄 제목", details: "스케줄 날짜, 장소" },
-    { time: "오후 2:00", title: "스케줄 제목", details: "스케줄 날짜, 장소" },
-  ],
-  tomorrow: [
-    { time: "오후 2:00", title: "스케줄 제목", details: "스케줄 날짜, 장소" },
-    { time: "오후 2:00", title: "스케줄 제목", details: "스케줄 날짜, 장소" },
-  ],
-};
 
 const ScheduleContainer = styled.View`
   flex-direction: row;
@@ -54,6 +32,15 @@ const ScheduleTextContent = styled.Text`
 const ScheduleList = styled.View`
   margin-top: 20px;
   width: 100%;
+  align-items: center;
+`;
+
+const NoScheduleText = styled.Text`
+  font-family: 'NanumSquareRoundR';
+  font-size: 16px;
+  color: #898989;
+  margin-top: 20px;
+  margin-bottom: 20px;
 `;
 
 const ScheduleCardContainer = styled.View`
@@ -103,9 +90,93 @@ const ShowMoreButton = styled.TouchableOpacity`
 
 export default function ThreeDaysSchedule({ showAllSchedules, toggleShowAllSchedules }) {
   const [selectedDay, setSelectedDay] = useState('today');
+  const [schedules, setSchedules] = useState({ yesterday: [], today: [], tomorrow: [] });
+
+  const BACKEND_URL = process.env.BACKEND_URL;
+
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      const today = new Date();
+      const yesterday = new Date(today);
+      const tomorrow = new Date(today);
+
+      yesterday.setDate(today.getDate() - 1);
+      tomorrow.setDate(today.getDate() + 1);
+
+      const formatDate = (date) =>
+        `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+      const formattedYesterday = formatDate(yesterday);
+      const formattedToday = formatDate(today);
+      const formattedTomorrow = formatDate(tomorrow);
+
+      try {
+        const response = await fetch(`${BACKEND_URL}/1/schedule/around?selectedDate=${formattedToday}`);
+        if (!response.ok) throw new Error('Failed to fetch schedules');
+        const data = await response.json();
+
+        const filteredSchedules = {
+          yesterday: [],
+          today: [],
+          tomorrow: [],
+        };
+
+        data.forEach((schedule) => {
+          const scheduleDate = new Date(schedule.scheduleDate);
+          const scheduleDateString = formatDate(scheduleDate);
+
+          if (scheduleDateString === formattedYesterday) {
+            filteredSchedules.yesterday.push(schedule);
+          } else if (scheduleDateString === formattedToday) {
+            filteredSchedules.today.push(schedule);
+          } else if (scheduleDateString === formattedTomorrow) {
+            filteredSchedules.tomorrow.push(schedule);
+          }
+        });
+
+        setSchedules({
+          yesterday: filteredSchedules.yesterday.map((schedule) => ({
+            time: new Date(schedule.scheduleDate).toLocaleTimeString('ko-KR', {
+              hour: '2-digit',
+              minute: '2-digit',
+            }),
+            title: schedule.scheduleName,
+            details: `${new Date(schedule.scheduleDate).toLocaleDateString('ko-KR')} - ${
+              schedule.location || '장소 미정'
+            }`,
+          })),
+          today: filteredSchedules.today.map((schedule) => ({
+            time: new Date(schedule.scheduleDate).toLocaleTimeString('ko-KR', {
+              hour: '2-digit',
+              minute: '2-digit',
+            }),
+            title: schedule.scheduleName,
+            details: `${new Date(schedule.scheduleDate).toLocaleDateString('ko-KR')} - ${
+              schedule.location || '장소 미정'
+            }`,
+          })),
+          tomorrow: filteredSchedules.tomorrow.map((schedule) => ({
+            time: new Date(schedule.scheduleDate).toLocaleTimeString('ko-KR', {
+              hour: '2-digit',
+              minute: '2-digit',
+            }),
+            title: schedule.scheduleName,
+            details: `${new Date(schedule.scheduleDate).toLocaleDateString('ko-KR')} - ${
+              schedule.location || '장소 미정'
+            }`,
+          })),
+        });
+      } catch (error) {
+        console.error('Error fetching schedules:', error);
+      }
+    };
+
+    fetchSchedules();
+  }, []);
+
   const displayedSchedules = showAllSchedules
     ? schedules[selectedDay]
-    : schedules[selectedDay].slice(0, 2);
+    : schedules[selectedDay]?.slice(0, 2);
 
   const handleDayChange = (day) => {
     setSelectedDay(day);
@@ -126,19 +197,23 @@ export default function ThreeDaysSchedule({ showAllSchedules, toggleShowAllSched
       </ScheduleContainer>
 
       <ScheduleList>
-        {displayedSchedules.map((schedule, index) => (
-          <ScheduleCard
-            key={index}
-            time={schedule.time}
-            title={schedule.title}
-            details={schedule.details}
-          />
-        ))}
+        {displayedSchedules.length > 0 ? (
+          displayedSchedules.map((schedule, index) => (
+            <ScheduleCard
+              key={index}
+              time={schedule.time}
+              title={schedule.title}
+              details={schedule.details}
+            />
+          ))
+        ) : (
+          <NoScheduleText>스케줄이 존재하지 않아요</NoScheduleText>
+        )}
       </ScheduleList>
 
       <ShowMoreButton onPress={toggleShowAllSchedules}>
         <Ionicons
-          name={showAllSchedules ? "chevron-up-outline" : "chevron-down-outline"}
+          name={showAllSchedules ? 'chevron-up-outline' : 'chevron-down-outline'}
           size={20}
           color="#000"
         />

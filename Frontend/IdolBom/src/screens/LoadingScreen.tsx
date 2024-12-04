@@ -46,7 +46,7 @@ export default function LoadingScreen() {
     ]).start(() => {
       // 애니메이션이 끝난 후 1초 뒤 LoginScreen으로 이동
       setTimeout(() => {
-        navigation.replace('Choose'); // LoginScreen으로 이동
+        navigation.replace('Login'); // LoginScreen으로 이동
       }, 1000);
     });
   }, [idolPosition, bomPosition, opacity, rotation, subtitleOpacity, navigation]);

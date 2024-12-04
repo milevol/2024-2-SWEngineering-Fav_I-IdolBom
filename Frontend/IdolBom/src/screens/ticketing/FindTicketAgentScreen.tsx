@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, Alert } from 'react-native';
 import styled from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -24,7 +24,7 @@ const BackgroundRectangle = styled.View`
 
 const LabelContainer = styled.View`
   position: absolute;
-  top: 240px;
+  top: 230px;
   left: 40px;
 `;
 
@@ -63,7 +63,7 @@ const OptionButton = styled.TouchableOpacity`
 
 const OptionText = styled.Text`
   font-family: 'NanumSquareRoundB';
-  font-size: 14px;
+  font-size: 16px;
   color: ${(props) => (props.selected ? '#ffffff' : '#000000')};
 `;
 
@@ -84,7 +84,7 @@ const RadioButton = styled.View`
   height: 20px;
   border-radius: 10px;
   border-width: 2px;
-  border-color: #1fa7db;
+  border-color: #3e95ff;
   align-items: center;
   justify-content: center;
   margin-right: 10px;
@@ -94,12 +94,12 @@ const RadioButtonInner = styled.View`
   width: 10px;
   height: 10px;
   border-radius: 5px;
-  background-color: #1fa7db;
+  background-color: #3e95ff;
 `;
 
 const RadioLabel = styled.Text`
   font-family: 'NanumSquareRoundB';
-  font-size: 16px;
+  font-size: 18px;
   color: #000000;
 `;
 
@@ -207,7 +207,7 @@ const ActionButtonText = styled.Text`
 
 const InfoLabel = styled.Text`
   font-family: 'NanumSquareRoundB';
-  font-size: 16px;
+  font-size: 20px;
   color: #000000;
   margin-bottom: 3px;
 `;
@@ -220,6 +220,8 @@ export default function FindTicketAgentScreen({ route }) {
   const [preferredArea, setPreferredArea] = useState('');
   const [message, setMessage] = useState('');
 
+  const BACKEND_URL = process.env.BACKEND_URL;
+
   const handlePeopleSelect = (value) => {
     setPeopleCount(value);
   };
@@ -229,15 +231,45 @@ export default function FindTicketAgentScreen({ route }) {
   };
 
   const handleActionButtonPress = () => {
-    navigation.navigate('MatchTicketAgent', {
-      schedule: {
-        ...schedule,
-        peopleCount,
-        preferredArea,
-        message,
-      },
-    });
-  };
+      Alert.alert(
+        '매칭 확인',
+        '입력한 정보를 바탕으로 매칭을 진행하시겠습니까?',
+        [
+          {
+            text: '취소',
+            style: 'cancel',
+          },
+          {
+            text: '확인',
+            onPress: async () => {
+              try {
+                const response = await fetch(`${BACKEND_URL}/ticketing/submit/${schedule.id}`, {
+                  method: 'PUT',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify({
+                    ticketNum: peopleCount.replace('명', '') || 0,
+                    seatingType: preferredArea || '미정',
+                    requestMessage: message || '없음',
+                  }),
+                });
+
+                if (!response.ok) {
+                  throw new Error(`서버 요청 실패: ${response.status}`);
+                }
+
+                Alert.alert('성공', '매칭이 신청되었습니다.');
+                navigation.goBack();
+              } catch (error) {
+                console.error('매칭 요청 중 오류 발생:', error);
+                Alert.alert('오류', '매칭 요청에 실패했습니다.');
+              }
+            },
+          },
+        ]
+      );
+    };
 
   return (
     <ScreenContainer>

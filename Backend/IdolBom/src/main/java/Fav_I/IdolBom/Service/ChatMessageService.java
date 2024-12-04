@@ -49,8 +49,9 @@ public class ChatMessageService {
         //redis에 데이터없는 경우만 mysql 조회하고, 조회된 데이터 redis에 캐싱
         String redisKey = CHATMESSAGE_KEY + ":" + chatRoomID.getId();
         List<ChatMessageDTO> cachedMessages = redisTemplate.opsForList().range(redisKey, 0, -1);
+
         if(cachedMessages == null|| cachedMessages.isEmpty()) {
-            List<Message> messages = chatMessageRepository.findByChatRoomID(chatRoomID);
+            List<Message> messages = chatMessageRepository.findAllByChatRoomID(chatRoomID);
             for(Message message : messages) {
                 redisTemplate.opsForList().rightPush(redisKey, ChatMessageDTO.fromEntity(message));
             }

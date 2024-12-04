@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.time.Instant;
 
+// 채팅방 목록 불러올 때 쓰는 거
 @Getter
 @Setter
 @Entity

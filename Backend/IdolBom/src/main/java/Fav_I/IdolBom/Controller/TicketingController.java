@@ -5,6 +5,7 @@ import Fav_I.IdolBom.Entity.Matching;
 import Fav_I.IdolBom.Entity.Ticketing;
 import Fav_I.IdolBom.Entity.User;
 import Fav_I.IdolBom.Repository.TicketingRepository;
+import Fav_I.IdolBom.Repository.UserRepository;
 import Fav_I.IdolBom.Service.TicketingService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import java.util.Map;
 public class TicketingController {
     private final TicketingService ticketingService;
     private final TicketingRepository ticketingRepository;
+    private final UserRepository userRepository;
 
     @GetMapping("/ticketing/list")
     public ResponseEntity<Map<String, Object>> getTicketingList() {
@@ -69,10 +71,9 @@ public class TicketingController {
     @PutMapping("/ticketing/match/{ticketing_id}")
     public ResponseEntity<?> matchTicketing(HttpSession session, @PathVariable("ticketing_id") int ticketing_id) {
         Map<String, Object> response = new LinkedHashMap<>();
-        Object agentUser = session.getAttribute("userInfo");
-
+        User agentUser = (User) session.getAttribute("userInfo");
         try {
-            Matching match = ticketingService.matchTicketing((User) agentUser, ticketing_id);
+            Matching match = ticketingService.matchTicketing(agentUser, ticketing_id);
             response.put("code", "SU");
             response.put("message", "Success.");
             response.put("matched", match);

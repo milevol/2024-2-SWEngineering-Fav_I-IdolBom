@@ -33,11 +33,11 @@ public class ChatRoom {
     @Column(name = "createdDate", nullable = false)
     private Instant createdDate;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "recruitmentID", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "recruitmentID")
     private Recruitment recruitmentID;
 
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "matchingID", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "matchingID")
     private Matching matchingID;
 }

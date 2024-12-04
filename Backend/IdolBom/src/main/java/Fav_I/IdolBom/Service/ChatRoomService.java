@@ -40,7 +40,7 @@ public class ChatRoomService {
     // 티켓팅 매칭 톡방 (1:1)
     public ChatRoom createChatRoom(Matching matching) {
         ChatRoom chatRoom = ChatRoom.builder()
-                .title("티켓팅 채팅방 (" + matching.getAgentID().getUserName() + ", " + matching.getApplicantID().getUserName())
+                .title("티켓팅 채팅방 (" + matching.getAgentID().getUserName() + ", " + matching.getApplicantID().getUserName() + ")")
                 .chatRoomImage(matching.getAgentID().getProfileImage())
                 .matchingID(matching).build();
         ChatRoom created = chatRoomRepository.save(chatRoom);

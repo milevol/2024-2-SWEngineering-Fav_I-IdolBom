@@ -46,6 +46,47 @@ const ScheduleCardList = styled.ScrollView`
   margin-bottom: 70px;
 `;
 
+const DropdownWrapper = styled.View`
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  z-index: 2;
+`;
+
+const DropdownButton = styled.TouchableOpacity`
+  padding: 4px 8px;
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 10px;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const DropdownText = styled.Text`
+  font-family: 'NanumSquareRound';
+  font-size: 14px;
+  color: #333333;
+  margin-right: 10px;
+`;
+
+const DropdownList = styled.FlatList`
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  margin-top: 5px;
+  max-height: 150px;
+`;
+
+const DropdownItem = styled.TouchableOpacity`
+  padding: 10px;
+`;
+
+const DropdownItemText = styled.Text`
+  font-family: 'NanumSquareRound';
+  font-size: 14px;
+  color: #333333;
+`;
+
 export default function CalendarSchedule({ navigation, onDaySelect, onCollapse, calendarExpanded }) {
   const [schedules, setSchedules] = useState([]);
   const [filteredSchedules, setFilteredSchedules] = useState([]);
@@ -53,6 +94,9 @@ export default function CalendarSchedule({ navigation, onDaySelect, onCollapse, 
   const [selectedDate, setSelectedDate] = useState(null);
   const [currentMonth, setCurrentMonth] = useState({ year: new Date().getFullYear(), month: new Date().getMonth() + 1 });
   const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState(['티켓팅', '일반 일정']);
+  const [selectedCategory, setSelectedCategory] = useState('카테고리 선택');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -121,6 +165,21 @@ export default function CalendarSchedule({ navigation, onDaySelect, onCollapse, 
     );
   }
 
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(category);
+    setIsDropdownOpen(false);
+    if (category === '전체') {
+      setFilteredSchedules(schedules.filter((schedule) => schedule.scheduleDate.split('T')[0] === selectedDate));
+    } else {
+      setFilteredSchedules(
+        schedules.filter(
+          (schedule) =>
+            schedule.scheduleDate.split('T')[0] === selectedDate && schedule.category === category
+        )
+      );
+    }
+  };
+
   return (
     <>
       <WhiteRectangle>
@@ -152,16 +211,36 @@ export default function CalendarSchedule({ navigation, onDaySelect, onCollapse, 
         </CalendarWrapper>
       </WhiteRectangle>
       {calendarExpanded && selectedDate && (
-        <ScheduleCardList>
-          {filteredSchedules.map((schedule) => (
-            <ScheduleCard
-              key={schedule.id}
-              title={schedule.scheduleName}
-              details={`${schedule.scheduleDate.split('T')[0]}, ${schedule.location || '위치 정보 없음'}`}
-              onPress={() => handleSchedulePress(schedule)}
-            />
-          ))}
-        </ScheduleCardList>
+        <>
+          <DropdownWrapper>
+            <DropdownButton onPress={() => setIsDropdownOpen(!isDropdownOpen)}>
+              <DropdownText>{selectedCategory}</DropdownText>
+              <Ionicons name={isDropdownOpen ? 'chevron-up' : 'chevron-down'} size={16} color="#333333" />
+            </DropdownButton>
+            {isDropdownOpen && (
+              <DropdownList
+                data={categories}
+                keyExtractor={(item) => item}
+                renderItem={({ item }) => (
+                  <DropdownItem onPress={() => handleCategorySelect(item)}>
+                    <DropdownItemText>{item}</DropdownItemText>
+                  </DropdownItem>
+                )}
+              />
+            )}
+          </DropdownWrapper>
+
+          <ScheduleCardList>
+            {filteredSchedules.map((schedule) => (
+              <ScheduleCard
+                key={schedule.id}
+                title={schedule.scheduleName}
+                details={`${schedule.scheduleDate.split('T')[0]}  ${schedule.location || '위치 정보 없음'}`}
+                onPress={() => handleSchedulePress(schedule)}
+              />
+            ))}
+          </ScheduleCardList>
+        </>
       )}
     </>
   );

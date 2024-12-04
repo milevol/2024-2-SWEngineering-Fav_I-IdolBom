@@ -231,45 +231,56 @@ export default function FindTicketAgentScreen({ route }) {
   };
 
   const handleActionButtonPress = () => {
-      Alert.alert(
-        '매칭 확인',
-        '입력한 정보를 바탕으로 매칭을 진행하시겠습니까?',
-        [
-          {
-            text: '취소',
-            style: 'cancel',
-          },
-          {
-            text: '확인',
-            onPress: async () => {
-              try {
-                const response = await fetch(`${BACKEND_URL}/ticketing/submit/${schedule.id}`, {
-                  method: 'PUT',
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-                  body: JSON.stringify({
-                    ticketNum: peopleCount.replace('명', '') || 0,
-                    seatingType: preferredArea || '미정',
-                    requestMessage: message || '없음',
-                  }),
-                });
+    Alert.alert(
+      '매칭 확인',
+      '입력한 정보를 바탕으로 매칭을 진행하시겠습니까?',
+      [
+        {
+          text: '취소',
+          style: 'cancel',
+        },
+        {
+          text: '확인',
+          onPress: async () => {
+            try {
+              const response = await fetch(`${BACKEND_URL}/ticketing/submit/${schedule.id}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  ticketNum: peopleCount.replace('명', '') || 0,
+                  seatingType: preferredArea || '미정',
+                  requestMessage: message || '없음',
+                }),
+              });
 
-                if (!response.ok) {
-                  throw new Error(`서버 요청 실패: ${response.status}`);
-                }
-
-                Alert.alert('성공', '매칭이 신청되었습니다.');
-                navigation.goBack();
-              } catch (error) {
-                console.error('매칭 요청 중 오류 발생:', error);
-                Alert.alert('오류', '매칭 요청에 실패했습니다.');
+              if (!response.ok) {
+                throw new Error(`서버 요청 실패: ${response.status}`);
               }
-            },
+
+              Alert.alert('성공', '매칭이 신청되었습니다.');
+              navigation.navigate('MatchTicketAgent', {
+                schedule: {
+                  id: schedule.id,
+                  title: schedule.scheduleName,
+                  date: schedule.scheduleDate.split('T')[0],
+                  location: schedule.location || '위치 정보 없음',
+                  peopleCount: peopleCount || '1명',
+                  preferredArea: preferredArea || '없음',
+                  message: message || '없음',
+                },
+              });
+            } catch (error) {
+              console.error('매칭 요청 중 오류 발생:', error);
+              Alert.alert('오류', '매칭 요청에 실패했습니다.');
+            }
           },
-        ]
-      );
-    };
+        },
+      ]
+    );
+  };
+
 
   return (
     <ScreenContainer>

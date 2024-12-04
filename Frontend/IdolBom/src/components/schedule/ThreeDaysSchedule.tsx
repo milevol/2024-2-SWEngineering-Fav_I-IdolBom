@@ -16,8 +16,10 @@ const ScheduleContainer = styled.View`
 `;
 
 const ScheduleText = styled.TouchableOpacity`
-  flex: 1;
   align-items: center;
+  justify-content: center;
+  ${({ isCenter }) => isCenter && 'flex: 2;'} /* 가운데 부분 확장 */
+  ${({ isCenter }) => !isCenter && 'flex: 1;'} /* 양쪽 버튼은 기본 크기 유지 */
 `;
 
 const ScheduleTextContent = styled.Text`
@@ -25,7 +27,7 @@ const ScheduleTextContent = styled.Text`
   font-size: 16px;
   color: ${({ selected }) => (selected ? '#000000' : '#898989')};
   background-color: ${({ selected }) => (selected ? '#FFFFFF' : 'transparent')};
-  padding: 7px 15px;
+  padding: 10px 15px;
   border-radius: 50px;
 `;
 
@@ -88,6 +90,15 @@ const ShowMoreButton = styled.TouchableOpacity`
   margin-top: 5px;
 `;
 
+const formatTodayText = () => {
+  const today = new Date();
+  const options = { month: 'long', day: 'numeric', weekday: 'short' };
+  const formattedDate = today.toLocaleDateString('ko-KR', options);
+
+  // "12월 4일 (수)" 형식으로 변환
+  return formattedDate.replace(/(\d+)월 (\d+)일/, '$1월 $2일');
+};
+
 export default function ThreeDaysSchedule({ showAllSchedules, toggleShowAllSchedules }) {
   const [selectedDay, setSelectedDay] = useState('today');
   const [schedules, setSchedules] = useState({ yesterday: [], today: [], tomorrow: [] });
@@ -141,7 +152,7 @@ export default function ThreeDaysSchedule({ showAllSchedules, toggleShowAllSched
               minute: '2-digit',
             }),
             title: schedule.scheduleName,
-            details: `${new Date(schedule.scheduleDate).toLocaleDateString('ko-KR')} - ${
+            details: `${new Date(schedule.scheduleDate).toLocaleDateString('ko-KR')} ${
               schedule.location || '장소 미정'
             }`,
           })),
@@ -151,7 +162,7 @@ export default function ThreeDaysSchedule({ showAllSchedules, toggleShowAllSched
               minute: '2-digit',
             }),
             title: schedule.scheduleName,
-            details: `${new Date(schedule.scheduleDate).toLocaleDateString('ko-KR')} - ${
+            details: `${new Date(schedule.scheduleDate).toLocaleDateString('ko-KR')} ${
               schedule.location || '장소 미정'
             }`,
           })),
@@ -161,7 +172,7 @@ export default function ThreeDaysSchedule({ showAllSchedules, toggleShowAllSched
               minute: '2-digit',
             }),
             title: schedule.scheduleName,
-            details: `${new Date(schedule.scheduleDate).toLocaleDateString('ko-KR')} - ${
+            details: `${new Date(schedule.scheduleDate).toLocaleDateString('ko-KR')} ${
               schedule.location || '장소 미정'
             }`,
           })),
@@ -188,8 +199,10 @@ export default function ThreeDaysSchedule({ showAllSchedules, toggleShowAllSched
         <ScheduleText onPress={() => handleDayChange('yesterday')}>
           <ScheduleTextContent selected={selectedDay === 'yesterday'}>어제</ScheduleTextContent>
         </ScheduleText>
-        <ScheduleText onPress={() => handleDayChange('today')}>
-          <ScheduleTextContent selected={selectedDay === 'today'}>오늘</ScheduleTextContent>
+        <ScheduleText onPress={() => handleDayChange('today')} isCenter>
+          <ScheduleTextContent selected={selectedDay === 'today'}>
+            {formatTodayText()}
+          </ScheduleTextContent>
         </ScheduleText>
         <ScheduleText onPress={() => handleDayChange('tomorrow')}>
           <ScheduleTextContent selected={selectedDay === 'tomorrow'}>내일</ScheduleTextContent>

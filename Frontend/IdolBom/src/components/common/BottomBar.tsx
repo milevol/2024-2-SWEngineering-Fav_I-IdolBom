@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
+import { useRecoilValue } from 'recoil';
+import { kakaoUserIDState } from '../../atoms/userAtom';
 import { useNavigation, CommonActions } from '@react-navigation/native';
 
 const BottomBarContainer = styled.View`
@@ -32,33 +34,41 @@ const TabText = styled.Text`
 export default function BottomBar() {
   const navigation = useNavigation();
   const [selectedTab, setSelectedTab] = useState("Home");
+  const kakaoUserID = useRecoilValue(kakaoUserIDState);
 
-  const handlePress = (screenName) => {
-    setSelectedTab(screenName);
 
-    if (screenName === "Home") {
-      // Main 네비게이터 안의 HomeStack에 있는 HomeScreen으로 이동하도록 설정
-      navigation.dispatch(
-        CommonActions.navigate({
-          name: "Main",
-          params: {
-            screen: "Home",
-            params: { screen: "HomeScreen" },
-          },
-        })
-      );
-    } else {
-      // 다른 화면 이동을 위한 설정
-      navigation.dispatch(
-        CommonActions.navigate({
-          name: "Main",
-          params: {
-            screen: screenName,
-          },
-        })
-      );
-    }
-  };
+
+ const handlePress = (screenName) => {
+   setSelectedTab(screenName);
+
+   if (screenName === "Home") {
+     navigation.dispatch(
+       CommonActions.navigate({
+         name: "Main",
+         params: {
+           screen: "Home",
+           params: {
+             screen: "HomeScreen",
+             params: { userID: kakaoUserID }
+           }
+         }
+       })
+     );
+   } else {
+     navigation.dispatch(
+       CommonActions.navigate({
+         name: "Main",
+         params: {
+           screen: screenName,
+           params: {
+             screen: `${screenName}Screen`,
+             params: { userID: kakaoUserID }
+           }
+         }
+       })
+     );
+   }
+ };
 
   return (
     <BottomBarContainer>

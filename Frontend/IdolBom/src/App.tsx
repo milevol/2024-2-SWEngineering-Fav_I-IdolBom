@@ -1,5 +1,6 @@
 // App.tsx
 import React, { useState } from 'react';
+import { RecoilRoot } from 'recoil';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -20,6 +21,7 @@ import RecruitDetailScreen from "./screens/recruit/RecruitDetailScreen";
 import CreateRecruitScreen from "./screens/recruit/CreateRecruitScreen";
 import ReportScreen from './screens/report/ReportScreen';
 import LoadingScreen from './screens/LoadingScreen';
+
 
 
 const Stack = createStackNavigator();
@@ -148,16 +150,17 @@ export default function App() {
         <Stack.Screen name="Choose" component={ChooseIdolManyScreen} />
         <Stack.Screen name="Main" component={MainTabs} />
 
-        <Stack.Screen
-          name="ReportScreen"
-          component={ReportScreen}
-          options={{
-            header: () => <Header title="" />,
-            headerShown: true,
-          }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+            <Stack.Screen
+              name="ReportScreen"
+              component={ReportScreen}
+              options={{
+                header: () => <Header title="" />,
+                headerShown: true,
+              }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+    </RecoilRoot>
   );
 }
 

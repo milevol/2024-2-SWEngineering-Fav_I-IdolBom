@@ -4,9 +4,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
+import { useRecoilValue } from 'recoil';
 import ThreeDaysSchedule from '../components/schedule/ThreeDaysSchedule';
 import CalendarSchedule from '../components/schedule/CalendarSchedule';
-
+import { kakaoUserIDState } from '../atoms/userAtom';
 const HomeScreenContainer = styled.View`
   flex: 1;
   background-color: #F3F8FF;
@@ -28,6 +29,8 @@ export default function HomeScreen() {
   const [showAllSchedules, setShowAllSchedules] = useState(false);
   const [calendarExpanded, setCalendarExpanded] = useState(false);
   const navigation = useNavigation();
+  const kakaoUserID = useRecoilValue(kakaoUserIDState);
+
 
   const toggleShowAllSchedules = () => {
     setShowAllSchedules(!showAllSchedules);
@@ -48,6 +51,7 @@ export default function HomeScreen() {
         <ThreeDaysSchedule
           showAllSchedules={showAllSchedules}
           toggleShowAllSchedules={toggleShowAllSchedules}
+          userID={kakaoUserID}
         />
       )}
       {!showAllSchedules && (
@@ -56,6 +60,7 @@ export default function HomeScreen() {
           onDaySelect={handleDaySelect}
           onCollapse={handleCollapse}
           calendarExpanded={calendarExpanded}
+          userID={kakaoUserID}
         />
       )}
     </HomeScreenContainer>

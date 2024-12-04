@@ -1,6 +1,5 @@
-// FindTicketAgentScreen.tsx
 import React, { useState } from 'react';
-import { SafeAreaView, TextInput } from 'react-native';
+import { SafeAreaView } from 'react-native';
 import styled from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -25,7 +24,7 @@ const BackgroundRectangle = styled.View`
 
 const LabelContainer = styled.View`
   position: absolute;
-  top: 250px;
+  top: 240px;
   left: 40px;
 `;
 
@@ -44,36 +43,78 @@ const Label = styled.Text`
 `;
 
 const IconLabelContainer = styled.View`
+  margin-bottom: 20px;
+`;
+
+const OptionList = styled.View`
   flex-direction: row;
-  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 10px;
+`;
+
+const OptionButton = styled.TouchableOpacity`
+  padding: 10px 20px;
+  background-color: ${(props) => (props.selected ? '#3e95ff' : '#ffffff')};
+  border: 1px solid ${(props) => (props.selected ? '#3e95ff' : '#a6a6a6')};
+  border-radius: 10px;
+  margin-right: 10px;
   margin-bottom: 10px;
 `;
 
-const IconWrapper = styled.View`
-  width: 35px;
-  height: 35px;
-  justify-content: center;
+const OptionText = styled.Text`
+  font-family: 'NanumSquareRoundB';
+  font-size: 14px;
+  color: ${(props) => (props.selected ? '#ffffff' : '#000000')};
+`;
+
+const RadioGroup = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 10px;
+`;
+
+const RadioButtonWrapper = styled.TouchableOpacity`
+  flex-direction: row;
   align-items: center;
+  margin-bottom: 5px;
+`;
+
+const RadioButton = styled.View`
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  border-width: 2px;
+  border-color: #1fa7db;
+  align-items: center;
+  justify-content: center;
   margin-right: 10px;
 `;
 
-const InfoLabel = styled.Text`
+const RadioButtonInner = styled.View`
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
+  background-color: #1fa7db;
+`;
+
+const RadioLabel = styled.Text`
   font-family: 'NanumSquareRoundB';
   font-size: 16px;
   color: #000000;
 `;
 
-const InfoInput = styled(TextInput)`
-  width: 53px;
-  height: 24px;
-  margin-left: 10px;
+const MessageInput = styled.TextInput`
+  width: 300px;
+  height: 40px;
   background: #ffffff;
   border: 1px solid #a6a6a6;
   border-radius: 10px;
-  text-align: center;
+  padding: 10px;
   font-family: 'NanumSquareRoundB';
   font-size: 14px;
   color: #676767;
+  margin-top: 5px;
+  text-align-vertical: top;
 `;
 
 const ScheduleType = styled.Text`
@@ -114,7 +155,7 @@ const Line = styled.View`
 
 const DateContainer = styled.View`
   position: absolute;
-  width: 140px;
+  width: 200px;
   height: 24.31px;
   left: 48px;
   top: 142px;
@@ -131,7 +172,7 @@ const DateText = styled.Text`
 
 const LocationContainer = styled.View`
   position: absolute;
-  width: 100px;
+  width: 500px;
   height: 23px;
   left: 48px;
   top: 175px;
@@ -164,17 +205,30 @@ const ActionButtonText = styled.Text`
   font-size: 18px;
 `;
 
+const InfoLabel = styled.Text`
+  font-family: 'NanumSquareRoundB';
+  font-size: 16px;
+  color: #000000;
+  margin-bottom: 3px;
+`;
+
 export default function FindTicketAgentScreen({ route }) {
-  const { schedule } = route.params; // 이전 화면에서 전달된 스케줄 데이터
+  const { schedule } = route.params;
   const navigation = useNavigation();
 
-  // 인원, 희망구역, 대리인에게 할 말 입력값을 상태로 관리
   const [peopleCount, setPeopleCount] = useState('');
   const [preferredArea, setPreferredArea] = useState('');
   const [message, setMessage] = useState('');
 
+  const handlePeopleSelect = (value) => {
+    setPeopleCount(value);
+  };
+
+  const handleRadioPress = (value) => {
+    setPreferredArea(value);
+  };
+
   const handleActionButtonPress = () => {
-    // 입력 데이터를 schedule 객체에 추가하여 전달
     navigation.navigate('MatchTicketAgent', {
       schedule: {
         ...schedule,
@@ -188,19 +242,18 @@ export default function FindTicketAgentScreen({ route }) {
   return (
     <ScreenContainer>
       <BackgroundRectangle />
-
-      <ScheduleType>{schedule.type}</ScheduleType>
+      <ScheduleType>{schedule.isTicketing ? '티켓팅' : '일반 일정'}</ScheduleType>
       <TitleContainer>
-        <ScheduleTitle>{schedule.title}</ScheduleTitle>
+        <ScheduleTitle>{schedule.scheduleName}</ScheduleTitle>
       </TitleContainer>
       <Line />
       <DateContainer>
         <MaterialCommunityIcons name="calendar-text" size={24} color="#B3B3B3" />
-        <DateText>{schedule.date}</DateText>
+        <DateText>{schedule.scheduleDate.split('T')[0]}</DateText>
       </DateContainer>
       <LocationContainer>
         <MaterialIcons name="place" size={24} color="#FF6868" />
-        <LocationText>{schedule.location}</LocationText>
+        <LocationText>{schedule.location || '위치 정보 없음'}</LocationText>
       </LocationContainer>
 
       <LabelContainer>
@@ -208,36 +261,48 @@ export default function FindTicketAgentScreen({ route }) {
           <Feather name="check-circle" size={24} color="#000000" />
           <Label>입력해주세요 (선택사항)</Label>
         </LabelWrapper>
+
+        {/* 인원 선택 */}
         <IconLabelContainer>
-          <IconWrapper>
-            <FontAwesome6 name="person" size={24} color="#898989" />
-          </IconWrapper>
           <InfoLabel>인원</InfoLabel>
-          <InfoInput
-            placeholder="1"
-            keyboardType="numeric"
-            value={peopleCount}
-            onChangeText={setPeopleCount}
-          />
+          <OptionList>
+            {['1명', '2명', '3명', '4명'].map((option) => (
+              <OptionButton
+                key={option}
+                selected={peopleCount === option}
+                onPress={() => handlePeopleSelect(option)}
+              >
+                <OptionText selected={peopleCount === option}>{option}</OptionText>
+              </OptionButton>
+            ))}
+          </OptionList>
         </IconLabelContainer>
+
+        {/* 라디오 버튼 */}
         <IconLabelContainer>
-          <IconWrapper>
-            <MaterialCommunityIcons name="sofa-single" size={24} color="#898989" />
-          </IconWrapper>
           <InfoLabel>희망구역</InfoLabel>
-          <InfoInput
-            placeholder="없음"
-            value={preferredArea}
-            onChangeText={setPreferredArea}
-          />
+          <RadioGroup>
+            <RadioButtonWrapper onPress={() => handleRadioPress('의자')}>
+              <RadioButton>
+                {preferredArea === '의자' && <RadioButtonInner />}
+              </RadioButton>
+              <RadioLabel>의자</RadioLabel>
+            </RadioButtonWrapper>
+            <RadioButtonWrapper onPress={() => handleRadioPress('스탠딩')}>
+              <RadioButton>
+                {preferredArea === '스탠딩' && <RadioButtonInner />}
+              </RadioButton>
+              <RadioLabel>스탠딩</RadioLabel>
+            </RadioButtonWrapper>
+          </RadioGroup>
         </IconLabelContainer>
+
+        {/* 메시지 입력 */}
         <IconLabelContainer>
-          <IconWrapper>
-            <MaterialCommunityIcons name="email-newsletter" size={24} color="#898989" />
-          </IconWrapper>
           <InfoLabel>대리인에게 할 말</InfoLabel>
-          <InfoInput
-            placeholder="없음"
+          <MessageInput
+            placeholder="대리인에게 전달할 메시지를 입력하세요."
+            multiline
             value={message}
             onChangeText={setMessage}
           />

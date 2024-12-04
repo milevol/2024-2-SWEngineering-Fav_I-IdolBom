@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components/native';
-import { ScrollView } from 'react-native';
+import { ActivityIndicator } from 'react-native';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import ScheduleCard from './ScheduleCard';
@@ -8,24 +8,20 @@ import ScheduleCard from './ScheduleCard';
 // Locale 설정
 LocaleConfig.locales['kr'] = {
   monthNames: [
-    '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'
+    '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월',
   ],
   monthNamesShort: [
-    '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'
+    '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월',
   ],
-  dayNames: [
-    '일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'
-  ],
-  dayNamesShort: [
-    '일', '월', '화', '수', '목', '금', '토'
-  ],
-  today: '오늘'
+  dayNames: ['일요일', '월요일', '화요일', '목요일', '금요일', '토요일'],
+  dayNamesShort: ['일', '월', '화', '수', '목', '금', '토'],
+  today: '오늘',
 };
 LocaleConfig.defaultLocale = 'kr';
 
 const WhiteRectangle = styled.View`
   width: 100%;
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   border-radius: 50px;
   padding: 0 24px;
   position: relative;
@@ -44,46 +40,6 @@ const CollapseButton = styled.TouchableOpacity`
   z-index: 1;
 `;
 
-const CategoryDropdownContainer = styled.View`
-  position: absolute;
-  left: 7px;
-  width: 130px;
-  background-color: #EAF0F8;
-  border-radius: 20px;
-  padding: 0 6px;
-  z-index: 2;
-`;
-
-const DropdownButton = styled.TouchableOpacity`
-  background-color: #EAF0F8;
-  border-radius: 20px;
-  padding: 6px;
-  align-items: center;
-  flex-direction: row;
-  justify-content: space-between;
-`;
-
-const DropdownText = styled.Text`
-  font-size: 14px;
-  color: #000;
-  font-family: 'NanumSquareRound';
-`;
-
-const DropdownList = styled.ScrollView`
-  max-height: 100px;
-  margin-top: 5px;
-`;
-
-const DropdownItem = styled.TouchableOpacity`
-  padding: 6px 10px;
-`;
-
-const DropdownItemText = styled.Text`
-  font-family: 'NanumSquareRound';
-  font-size: 14px;
-  color: #000;
-`;
-
 const ScheduleCardList = styled.ScrollView`
   margin-top: 50px;
   max-height: 300px;
@@ -91,68 +47,97 @@ const ScheduleCardList = styled.ScrollView`
 `;
 
 export default function CalendarSchedule({ navigation, onDaySelect, onCollapse, calendarExpanded }) {
-  const [selectedCategory, setSelectedCategory] = useState("카테고리 선택");
-  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [schedules, setSchedules] = useState([]);
+  const [filteredSchedules, setFilteredSchedules] = useState([]);
+  const [markedDates, setMarkedDates] = useState({});
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [currentMonth, setCurrentMonth] = useState({ year: new Date().getFullYear(), month: new Date().getMonth() + 1 });
+  const [loading, setLoading] = useState(true);
 
-  const schedules = [
-    { id: 1, title: '미팅', date: '2024-11-15', location: '서울역', type: '회의', description: '안녕하세요?' },
-    { id: 2, title: '프로젝트 회의', date: '2024-11-16', location: '강남구청', type: '회의', description: '안녕하세요?' },
-  ];
+  const BACKEND_URL = process.env.BACKEND_URL;
 
-  const handleCategorySelect = (category) => {
-    setSelectedCategory(category);
-    setDropdownVisible(false);
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      const { year, month } = currentMonth;
+      try {
+        const response = await fetch(`${BACKEND_URL}/1/schedule/exists?year=${year}&month=${month}`);
+        if (!response.ok) throw new Error('Failed to fetch schedules');
+        const data = await response.json();
+
+        setSchedules(data);
+
+        const marked = {};
+        data.forEach(schedule => {
+          const date = schedule.scheduleDate.split('T')[0];
+          marked[date] = { marked: true, dotColor: '#3E95FF' };
+        });
+
+        setMarkedDates(marked);
+      } catch (error) {
+        console.error('Error fetching schedules:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSchedules();
+  }, [currentMonth]);
+
+  const handleMonthChange = (month) => {
+    setCurrentMonth({ year: month.year, month: month.month });
+    setSelectedDate(null);
+    setFilteredSchedules([]);
+  };
+
+  const handleDayPress = (day) => {
+    const selected = day.dateString;
+    setSelectedDate(selected);
+
+    const filtered = schedules.filter(
+      (schedule) => schedule.scheduleDate.split('T')[0] === selected
+    );
+    setFilteredSchedules(filtered);
+
+    onDaySelect && onDaySelect(selected);
+  };
+
+  const handleCollapse = () => {
+    setSelectedDate(null);
+    setFilteredSchedules([]);
+    onCollapse && onCollapse();
   };
 
   const handleSchedulePress = (schedule) => {
-    navigation && navigation.navigate('ScheduleDetail', { schedule });
+    navigation.navigate('ScheduleDetail', { schedule });
   };
+
+  if (loading) {
+    return (
+      <ActivityIndicator
+        size="large"
+        color="#3E95FF"
+        style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+      />
+    );
+  }
 
   return (
     <>
       <WhiteRectangle>
         <CalendarWrapper calendarExpanded={calendarExpanded}>
           {calendarExpanded && (
-            <>
-              <CategoryDropdownContainer>
-                <DropdownButton onPress={() => setDropdownVisible(!dropdownVisible)}>
-                  <DropdownText>{selectedCategory}</DropdownText>
-                  <Ionicons name="chevron-down-outline" size={16} color="#000" />
-                </DropdownButton>
-                {dropdownVisible && (
-                  <DropdownList>
-                    <DropdownItem onPress={() => handleCategorySelect('미팅')}>
-                      <DropdownItemText>미팅</DropdownItemText>
-                    </DropdownItem>
-                    <DropdownItem onPress={() => handleCategorySelect('프로젝트')}>
-                      <DropdownItemText>프로젝트</DropdownItemText>
-                    </DropdownItem>
-                    <DropdownItem onPress={() => handleCategorySelect('스터디')}>
-                      <DropdownItemText>스터디</DropdownItemText>
-                    </DropdownItem>
-                    <DropdownItem onPress={() => handleCategorySelect('개발')}>
-                      <DropdownItemText>개발</DropdownItemText>
-                    </DropdownItem>
-                  </DropdownList>
-                )}
-              </CategoryDropdownContainer>
-              <CollapseButton onPress={onCollapse}>
-                <Ionicons name="chevron-up-outline" size={20} color="#000" />
-              </CollapseButton>
-            </>
+            <CollapseButton onPress={handleCollapse}>
+              <Ionicons name="chevron-up-outline" size={20} color="#000" />
+            </CollapseButton>
           )}
           <Calendar
-            current={'2024-11-15'}
             monthFormat={'yyyy년 MM월'}
             markedDates={{
-              '2024-11-15': { selected: true, marked: true, selectedColor: '#3E95FF' },
-              '2024-11-20': { marked: true, dotColor: '#3E95FF' },
-              '2024-11-25': { marked: true, dotColor: '#3E95FF' },
+              ...markedDates,
+              [selectedDate]: { selected: true, selectedColor: '#3E95FF' },
             }}
-            onDayPress={(day) => {
-              console.log('selected day', day);
-              onDaySelect();
-            }}
+            onDayPress={handleDayPress}
+            onMonthChange={handleMonthChange}
             theme={{
               selectedDayBackgroundColor: '#3E95FF',
               selectedDayTextColor: '#ffffff',
@@ -166,16 +151,18 @@ export default function CalendarSchedule({ navigation, onDaySelect, onCollapse, 
           />
         </CalendarWrapper>
       </WhiteRectangle>
-      <ScheduleCardList>
-        {schedules.map((schedule) => (
-          <ScheduleCard
-            key={schedule.id}
-            title={schedule.title}
-            details={`${schedule.date}, ${schedule.location}`}
-            onPress={() => handleSchedulePress(schedule)}
-          />
-        ))}
-      </ScheduleCardList>
+      {calendarExpanded && selectedDate && (
+        <ScheduleCardList>
+          {filteredSchedules.map((schedule) => (
+            <ScheduleCard
+              key={schedule.id}
+              title={schedule.scheduleName}
+              details={`${schedule.scheduleDate.split('T')[0]}, ${schedule.location || '위치 정보 없음'}`}
+              onPress={() => handleSchedulePress(schedule)}
+            />
+          ))}
+        </ScheduleCardList>
+      )}
     </>
   );
 }

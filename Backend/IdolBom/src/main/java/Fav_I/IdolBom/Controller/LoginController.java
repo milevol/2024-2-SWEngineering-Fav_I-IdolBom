@@ -1,5 +1,6 @@
 package Fav_I.IdolBom.Controller;
 
+import Fav_I.IdolBom.DTO.CodeDTO;
 import Fav_I.IdolBom.DTO.GetTokenDTO;
 import Fav_I.IdolBom.DTO.KakaoUserDTO;
 import Fav_I.IdolBom.Entity.Ticketing;
@@ -15,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,23 +35,23 @@ public class LoginController {
 
 
     @PostMapping("/auth/callback")
-    public ResponseEntity<?> handleCallback(@RequestBody Map<String, String> requestBody) {
+    public ResponseEntity<?> handleCallback(@RequestParam("code") String code) {
         Map<String, Object> response = new LinkedHashMap<>();
-        String code = requestBody.get("code");
 
         try {
-            log.info("GET Request Received. Authorization Code: {}", code);
+            log.info("Authorization Code: {}", code);
             // 카카오 토큰 요청
             GetTokenDTO accessToken = loginService.getAccessTokenFromKakao(code);
 
             log.info("kakao accessToken : {}", accessToken);
             // 사용자 정보 요청
             KakaoUserDTO userInfo = loginService.getKakaoInfo(accessToken.getAccessToken());
+
             log.info(userInfo.toString());
 
             // 사용자 등록
-            loginService.register(userInfo);
-            session.setAttribute("userInfo", userInfo);
+            User loginUser = loginService.register(userInfo);
+            session.setAttribute("userInfo", loginUser);
             session.setMaxInactiveInterval(60 * 60 * 24); // 24시간
 
             // 응답 데이터 구성

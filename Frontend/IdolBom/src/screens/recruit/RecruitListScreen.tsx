@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components/native";
-import { ScrollView, Image, TouchableOpacity } from "react-native";
+import { ScrollView, TouchableOpacity } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 const RecruitListContainer = styled.View`
   flex: 1;
@@ -8,35 +9,53 @@ const RecruitListContainer = styled.View`
 `;
 
 const Header = styled.View`
-  padding: 20px;
+  padding: 20px 15px; /* 양쪽 여백 */
   background-color: #f3f8ff;
+  flex-direction: row; /* 제목과 버튼을 가로로 배치 */
+  align-items: center; /* 세로 가운데 정렬 */
+  justify-content: space-between; ; /* 제목과 버튼 간격 조정 */
+`;
+
+// 동행 만들기 버튼 스타일
+const CreateButton = styled.TouchableOpacity`
+  padding: 8px 16px; /* 버튼 크기 조정 */
+  background-color: #4096ff; /* 버튼 배경색 */
+  border-radius: 10px; /* 모서리 둥글기 */
+  align-items: center;
+  justify-content: center;
+  max-width: 120px; /* 버튼 가로 길이 제한 */
+  margin-left: -160px;
+`;
+// 동행 만들기 버튼 텍스트 스타일
+const CreateButtonText = styled.Text`
+  font-family: "NanumSquareRoundEB";
+  font-size: 16px;
+  color: #ffffff; /* 텍스트 색상 */
 `;
 
 const Title = styled.Text`
   font-family: "NanumSquareRoundEB";
   font-size: 24px;
   color: #000000;
+  margin-left:15px;
 `;
-
 
 const FilterContainer = styled.View`
   flex-direction: row;
-  justify-content: space-evenly; /* space-between 대신 사용 */
+  justify-content: space-evenly; /* 필터 버튼 간 간격 */
   margin-top: 15px;
 `;
 
 const FilterButton = styled.TouchableOpacity<{ selected: boolean }>`
-  padding: 10px 20px;
+  padding: 8px 16px; /* 버튼 크기 조정 */
   border-radius: 20px;
   border: 2px solid ${({ selected }) => (selected ? "#1FA7DB" : "#D9D9D9")};
   background-color: #ffffff;
-  margin-horizontal: 20px; /* 버튼 간의 간격 */
 `;
-
 
 const FilterButtonText = styled.Text<{ selected: boolean }>`
   font-family: "NanumSquareRoundEB";
-  font-size: 16px;
+  font-size: 14px;
   color: ${({ selected }) => (selected ? "#1FA7DB" : "#000000")};
 `;
 
@@ -126,22 +145,9 @@ const TagText = styled.Text`
   color: #666666;
 `;
 
-const FloatingButtonContainer = styled(TouchableOpacity)`
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  width: 60px;
-  height: 60px;
-  border-radius: 30px;
-  background-color: #ffffff;
-  justify-content: center;
-  align-items: center;
-  elevation: 5; /* Android 그림자 효과 */
-  z-index: 9999; /* iOS에서 z-index 효과 */
-`;
-
 export default function RecruitListScreen() {
   const [selectedFilter, setSelectedFilter] = useState("전체");
+  const navigation = useNavigation();
 
   const filters = ["전체", "모집중", "완료"];
 
@@ -149,270 +155,81 @@ export default function RecruitListScreen() {
     setSelectedFilter(filter);
   };
 
-  const handleCreateRecruit = () => {
-    console.log("Floating button clicked!");
+  const handleCardPress = (title: string, details: string) => {
+    navigation.navigate("RecruitDetail", { title, details });
+  };
+
+  const handleCreateButtonPress = () => {
+    // 동행 만들기 버튼 클릭 시 CreateRecruit 페이지로 이동
+    navigation.navigate("CreateRecruit");
   };
 
   return (
     <RecruitListContainer>
+      {/* 헤더 */}
       <Header>
         <Title>동행 모아보기</Title>
-        <FilterContainer>
-          {filters.map((filter) => (
-            <FilterButton
-              key={filter}
-              selected={filter === selectedFilter}
-              onPress={() => handleFilterClick(filter)}
-            >
-              <FilterButtonText selected={filter === selectedFilter}>
-                {filter}
-              </FilterButtonText>
-            </FilterButton>
-          ))}
-        </FilterContainer>
+        <CreateButton onPress={handleCreateButtonPress}>
+          <CreateButtonText>동행 만들기</CreateButtonText>
+        </CreateButton>
       </Header>
+      {/* 필터 */}
+      <FilterContainer>
+        {filters.map((filter) => (
+          <FilterButton
+            key={filter}
+            selected={filter === selectedFilter}
+            onPress={() => handleFilterClick(filter)}
+          >
+            <FilterButtonText selected={filter === selectedFilter}>
+              {filter}
+            </FilterButtonText>
+          </FilterButton>
+        ))}
+      </FilterContainer>
+      {/* 카드 목록 */}
       <ContentContainer>
-        <RecruitCard>
-          <RecruitCardHeader>
-            <RecruitCardTitle>[콘서트] 동행모집 제목</RecruitCardTitle>
-            <ParticipantsContainer>
-              <ParticipantsImage
-                source={require("../../assets/images/people_icon.png")}
-              />
-              <ParticipantsText>3/6</ParticipantsText>
-            </ParticipantsContainer>
-          </RecruitCardHeader>
-          <DetailText>2024.00.00 ~ 2024.00.00</DetailText>
-          <RecruitCardDetails>
-            <DetailIcon
-              source={require("../../assets/images/line-md_calendar.png")}
-            />
-            <DetailText>2024.00.00 요일</DetailText>
-          </RecruitCardDetails>
-          <TagsContainer>
-            <Tag>
-              <TagText>모든 성별</TagText>
-            </Tag>
-            <Tag>
-              <TagText>희망 나이대</TagText>
-            </Tag>
-            <Tag>
-              <TagText>희망 지역</TagText>
-            </Tag>
-          </TagsContainer>
-        </RecruitCard>
-        <RecruitCard>
-          <RecruitCardHeader>
-            <RecruitCardTitle>[콘서트] 동행모집 제목</RecruitCardTitle>
-            <ParticipantsContainer>
-              <ParticipantsImage
-                source={require("../../assets/images/people_icon.png")}
-              />
-              <ParticipantsText>3/6</ParticipantsText>
-            </ParticipantsContainer>
-          </RecruitCardHeader>
-          <DetailText>2024.00.00 ~ 2024.00.00</DetailText>
-          <RecruitCardDetails>
-            <DetailIcon
-              source={require("../../assets/images/line-md_calendar.png")}
-            />
-            <DetailText>2024.00.00 요일</DetailText>
-          </RecruitCardDetails>
-          <TagsContainer>
-            <Tag>
-              <TagText>모든 성별</TagText>
-            </Tag>
-            <Tag>
-              <TagText>희망 나이대</TagText>
-            </Tag>
-            <Tag>
-              <TagText>희망 지역</TagText>
-            </Tag>
-          </TagsContainer>
-        </RecruitCard>
-        <RecruitCard>
-          <RecruitCardHeader>
-            <RecruitCardTitle>[콘서트] 동행모집 제목</RecruitCardTitle>
-            <ParticipantsContainer>
-              <ParticipantsImage
-                source={require("../../assets/images/people_icon.png")}
-              />
-              <ParticipantsText>3/6</ParticipantsText>
-            </ParticipantsContainer>
-          </RecruitCardHeader>
-          <DetailText>2024.00.00 ~ 2024.00.00</DetailText>
-          <RecruitCardDetails>
-            <DetailIcon
-              source={require("../../assets/images/line-md_calendar.png")}
-            />
-            <DetailText>2024.00.00 요일</DetailText>
-          </RecruitCardDetails>
-          <TagsContainer>
-            <Tag>
-              <TagText>모든 성별</TagText>
-            </Tag>
-            <Tag>
-              <TagText>희망 나이대</TagText>
-            </Tag>
-            <Tag>
-              <TagText>희망 지역</TagText>
-            </Tag>
-          </TagsContainer>
-        </RecruitCard>
-        <RecruitCard>
-          <RecruitCardHeader>
-            <RecruitCardTitle>[콘서트] 동행모집 제목</RecruitCardTitle>
-            <ParticipantsContainer>
-              <ParticipantsImage
-                source={require("../../assets/images/people_icon.png")}
-              />
-              <ParticipantsText>3/6</ParticipantsText>
-            </ParticipantsContainer>
-          </RecruitCardHeader>
-          <DetailText>2024.00.00 ~ 2024.00.00</DetailText>
-          <RecruitCardDetails>
-            <DetailIcon
-              source={require("../../assets/images/line-md_calendar.png")}
-            />
-            <DetailText>2024.00.00 요일</DetailText>
-          </RecruitCardDetails>
-          <TagsContainer>
-            <Tag>
-              <TagText>모든 성별</TagText>
-            </Tag>
-            <Tag>
-              <TagText>희망 나이대</TagText>
-            </Tag>
-            <Tag>
-              <TagText>희망 지역</TagText>
-            </Tag>
-          </TagsContainer>
-        </RecruitCard>
-        <RecruitCard>
-          <RecruitCardHeader>
-            <RecruitCardTitle>[콘서트] 동행모집 제목</RecruitCardTitle>
-            <ParticipantsContainer>
-              <ParticipantsImage
-                source={require("../../assets/images/people_icon.png")}
-              />
-              <ParticipantsText>3/6</ParticipantsText>
-            </ParticipantsContainer>
-          </RecruitCardHeader>
-          <DetailText>2024.00.00 ~ 2024.00.00</DetailText>
-          <RecruitCardDetails>
-            <DetailIcon
-              source={require("../../assets/images/line-md_calendar.png")}
-            />
-            <DetailText>2024.00.00 요일</DetailText>
-          </RecruitCardDetails>
-          <TagsContainer>
-            <Tag>
-              <TagText>모든 성별</TagText>
-            </Tag>
-            <Tag>
-              <TagText>희망 나이대</TagText>
-            </Tag>
-            <Tag>
-              <TagText>희망 지역</TagText>
-            </Tag>
-          </TagsContainer>
-        </RecruitCard>
-        <RecruitCard>
-          <RecruitCardHeader>
-            <RecruitCardTitle>[콘서트] 동행모집 제목</RecruitCardTitle>
-            <ParticipantsContainer>
-              <ParticipantsImage
-                source={require("../../assets/images/people_icon.png")}
-              />
-              <ParticipantsText>3/6</ParticipantsText>
-            </ParticipantsContainer>
-          </RecruitCardHeader>
-          <DetailText>2024.00.00 ~ 2024.00.00</DetailText>
-          <RecruitCardDetails>
-            <DetailIcon
-              source={require("../../assets/images/line-md_calendar.png")}
-            />
-            <DetailText>2024.00.00 요일</DetailText>
-          </RecruitCardDetails>
-          <TagsContainer>
-            <Tag>
-              <TagText>모든 성별</TagText>
-            </Tag>
-            <Tag>
-              <TagText>희망 나이대</TagText>
-            </Tag>
-            <Tag>
-              <TagText>희망 지역</TagText>
-            </Tag>
-          </TagsContainer>
-        </RecruitCard>
-        <RecruitCard>
-          <RecruitCardHeader>
-            <RecruitCardTitle>[콘서트] 동행모집 제목</RecruitCardTitle>
-            <ParticipantsContainer>
-              <ParticipantsImage
-                source={require("../../assets/images/people_icon.png")}
-              />
-              <ParticipantsText>3/6</ParticipantsText>
-            </ParticipantsContainer>
-          </RecruitCardHeader>
-          <DetailText>2024.00.00 ~ 2024.00.00</DetailText>
-          <RecruitCardDetails>
-            <DetailIcon
-              source={require("../../assets/images/line-md_calendar.png")}
-            />
-            <DetailText>2024.00.00 요일</DetailText>
-          </RecruitCardDetails>
-          <TagsContainer>
-            <Tag>
-              <TagText>모든 성별</TagText>
-            </Tag>
-            <Tag>
-              <TagText>희망 나이대</TagText>
-            </Tag>
-            <Tag>
-              <TagText>희망 지역</TagText>
-            </Tag>
-          </TagsContainer>
-        </RecruitCard>
-        <RecruitCard>
-          <RecruitCardHeader>
-            <RecruitCardTitle>[콘서트] 동행모집 제목</RecruitCardTitle>
-            <ParticipantsContainer>
-              <ParticipantsImage
-                source={require("../../assets/images/people_icon.png")}
-              />
-              <ParticipantsText>3/6</ParticipantsText>
-            </ParticipantsContainer>
-          </RecruitCardHeader>
-          <DetailText>2024.00.00 ~ 2024.00.00</DetailText>
-          <RecruitCardDetails>
-            <DetailIcon
-              source={require("../../assets/images/line-md_calendar.png")}
-            />
-            <DetailText>2024.00.00 요일</DetailText>
-          </RecruitCardDetails>
-          <TagsContainer>
-            <Tag>
-              <TagText>모든 성별</TagText>
-            </Tag>
-            <Tag>
-              <TagText>희망 나이대</TagText>
-            </Tag>
-            <Tag>
-              <TagText>희망 지역</TagText>
-            </Tag>
-          </TagsContainer>
-        </RecruitCard>
-        {/* 추가 카드 */}
+        {Array.from({ length: 8 }, (_, i) => (
+          <TouchableOpacity
+            key={i}
+            onPress={() =>
+              handleCardPress(`[콘서트] 동행모집 제목 ${i + 1}`, "2024.00.00 ~ 2024.00.00")
+            }
+          >
+            <RecruitCard>
+              <RecruitCardHeader>
+                <RecruitCardTitle>
+                  [콘서트] 동행모집 제목 {i + 1}
+                </RecruitCardTitle>
+                <ParticipantsContainer>
+                  <ParticipantsImage
+                    source={require("../../assets/images/people_icon.png")}
+                  />
+                  <ParticipantsText>3/6</ParticipantsText>
+                </ParticipantsContainer>
+              </RecruitCardHeader>
+              <DetailText>2024.00.00 ~ 2024.00.00</DetailText>
+              <RecruitCardDetails>
+                <DetailIcon
+                  source={require("../../assets/images/line-md_calendar.png")}
+                />
+                <DetailText>2024.00.00 요일</DetailText>
+              </RecruitCardDetails>
+              <TagsContainer>
+                <Tag>
+                  <TagText>모든 성별</TagText>
+                </Tag>
+                <Tag>
+                  <TagText>희망 나이대</TagText>
+                </Tag>
+                <Tag>
+                  <TagText>희망 지역</TagText>
+                </Tag>
+              </TagsContainer>
+            </RecruitCard>
+          </TouchableOpacity>
+        ))}
       </ContentContainer>
-      <FloatingButtonContainer onPress={handleCreateRecruit}>
-        <Image
-          source={require("../../assets/images/create_recruit_icon.png")}
-          style={{ width: 30, height: 30 }}
-          resizeMode="contain"
-        />
-      </FloatingButtonContainer>
     </RecruitListContainer>
   );
 }

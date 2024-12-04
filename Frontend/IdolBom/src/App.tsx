@@ -15,6 +15,8 @@ import ChatListScreen from './screens/chat/ChatListScreen';
 import ChatScreen from './screens/chat/ChatScreen';
 import LoginScreen from './screens/LoginScreen';
 import RecruitListScreen from "./screens/recruit/RecruitListScreen";
+import RecruitDetailScreen from "./screens/recruit/RecruitDetailScreen";
+import CreateRecruitScreen from "./screens/recruit/CreateRecruitScreen";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -111,18 +113,32 @@ const RecruitStack = () => {
         name="Recruit"
         component={RecruitListScreen}
         options={{
-          header: () => <TopBar />, // HomeScreen에서는 TopBar 렌더링
+          header: () => <TopBar />,
         }}
       />
-
-    </Stack.Navigator>
+      <Stack.Screen
+        name="RecruitDetail"
+        component={RecruitDetailScreen}
+        options={{
+          header: () => <Header title="동행 상세정보" />,
+        }}
+      />
+     <Stack.Screen
+            name="CreateRecruit"
+            component={CreateRecruitScreen}
+            options={{
+              header: () => <Header title="동행 만들기" />,
+            }}
+          />
+   </Stack.Navigator>
   );
 };
+
 export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {/*<Stack.Screen name="Login" component={LoginScreen} />*/}
+        <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Main" component={MainTabs} />
       </Stack.Navigator>
     </NavigationContainer>

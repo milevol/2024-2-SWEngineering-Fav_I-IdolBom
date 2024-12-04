@@ -14,11 +14,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 
 @RestController
@@ -42,6 +46,15 @@ public class ChatController {
     @Autowired
     private TicketingRepository ticketingRepository;
 
+    @MessageMapping("/connect")
+    public void validateChatRoomId(@Payload Map<String, String> payload, SimpMessageHeaderAccessor headerAccessor) {
+        String chatRoomId = payload.get("chatRoomId");
+        if (chatRoomRepository.findById(Integer.parseInt(chatRoomId)).isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Chat room not found");
+        }
+        Objects.requireNonNull(headerAccessor.getSessionAttributes()).put("chatRoomId", chatRoomId);
+    }
+
     @MessageMapping("/send") // 클라이언트에서 /pub/send로 메시지를 보내면
     //@SendTo("/sub/chat/{chatRoomID}")  // /sub/chat로 메시지를 보낸다
     public void sendMessage(ChatMessageDTO message) {
@@ -50,7 +63,7 @@ public class ChatController {
 
         // redis pub/sub으로 메시지 발행
         String channelName = "chatroom:" + message.getChatRoomID();
-        messagePublisher.publish(channelName, message.getContent());
+        messagePublisher.publish(channelName, message);
         //return message;
     }
 // chatroom 객체 대신 id 받아오게 수정해야 함

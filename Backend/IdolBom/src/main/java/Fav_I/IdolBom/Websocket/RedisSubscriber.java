@@ -29,22 +29,26 @@ public class RedisSubscriber implements MessageListener {
             String publishMessage = new String(message.getBody());
             // 메시지 한번 파싱해 재사용
             MessageSubDTO dto = objectMapper.readValue(publishMessage, MessageSubDTO.class);
-            sendMessage(dto);
-            sendRoomList(dto);
+            if(dto.getChatMessageDTO() != null) {
+                sendMessage(dto.getChatMessageDTO());
+            }
+            //sendRoomList(dto);
+            if (!dto.getApplicantList().isEmpty() || !dto.getAgentList().isEmpty()) {
+                sendRoomList(dto);
+            }
         } catch (Exception e) {
             log.error("Invalid Redis message format: {}", new String(message.getBody()), e);
         }
     }
 
     // redis에서 받은 메시지를 특정 채팅방에 발송
-    public void sendMessage(MessageSubDTO dto) {
+    public void sendMessage(ChatMessageDTO dto) {
         try {
             // MessageSubDto에서 ChatMessageDTO를 추출하여 채팅방 구독자에게 발송
-            ChatMessageDTO chatMessage = dto.getChatMessageDTO();
+            //ChatMessageDTO chatMessage = dto;
             // 채팅방을 구독한 클라이언트에게 메시지 발송
             messagingTemplate.convertAndSend(
-                    "/sub/chat/room/" + chatMessage.getChatRoomID(), chatMessage
-            );
+                    "/sub/chat/room/" + dto.getChatRoomID(), dto);
 
         } catch (Exception e) {
             log.error("Exception {}", e);

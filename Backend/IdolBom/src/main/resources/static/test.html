@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat WebSocket Test</title>
+</head>
+<body>
+<h1>Chat WebSocket Client</h1>
+
+<div>
+    <label for="chatRoomID">Chat Room ID:</label>
+    <input type="text" id="chatRoomID" placeholder="Enter Chat Room ID" />
+    <button onclick="connect()">Connect</button>
+    <button onclick="disconnect()">Disconnect</button>
+</div>
+
+<div id="chatArea" style="display: none;">
+    <h2>Chat Room</h2>
+    <div id="messages" style="border: 1px solid #000; height: 300px; overflow-y: auto;"></div>
+    <input type="text" id="messageInput" placeholder="Type your message" />
+    <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+    let stompClient = null;
+    let chatRoomID = 1234567891;
+
+    function connect() {
+        chatRoomID = document.getElementById('chatRoomID').value;
+        if (!chatRoomID) {
+            alert('Please enter a Chat Room ID.');
+            return;
+        }
+
+        const socket = new SockJS('/ws/chat'); // 서버의 WebSocket 엔드포인트
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, function () {
+            console.log('Connected to WebSocket');
+
+            // Subscribe to chat room messages
+            stompClient.subscribe('/sub/chat/room/' + chatRoomID, function (messageOutput) {
+                showMessage(JSON.parse(messageOutput.body).content);
+            });
+
+            document.getElementById('chatArea').style.display = 'block';
+        }, function (error) {
+            console.error('WebSocket error: ' + error);
+        });
+    }
+
+    function disconnect() {
+        if (stompClient !== null) {
+            stompClient.disconnect();
+        }
+        console.log('Disconnected');
+        document.getElementById('chatArea').style.display = 'none';
+    }
+
+    function sendMessage() {
+        const message = document.getElementById('messageInput').value;
+        if (!message) {
+            alert('Please enter a message.');
+            return;
+        }
+
+        const messagePayload = {
+            chatRoomID: chatRoomID,
+            senderID: 3817719045, // Replace with the sender's actual ID
+            content: message,
+            sendDate: new Date().toISOString()
+        };
+
+        stompClient.send('/pub/send', {}, JSON.stringify(messagePayload));
+        document.getElementById('messageInput').value = '';
+    }
+
+    function showMessage(message) {
+        const messagesDiv = document.getElementById('messages');
+        const messageElement = document.createElement('div');
+        messageElement.textContent = message;
+        messagesDiv.appendChild(messageElement);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+</script>
+</body>
+</html>

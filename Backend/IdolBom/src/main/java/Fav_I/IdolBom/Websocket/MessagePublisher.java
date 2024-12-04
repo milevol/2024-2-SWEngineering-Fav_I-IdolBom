@@ -13,7 +13,7 @@ public class MessagePublisher {
     private RedisTemplate<String, ChatMessageDTO> redisTemplate;
     @Autowired
     private ObjectMapper objectMapper;
-    public void publish(String channel, Object messageDTO) {
+    public void publish(String channel, ChatMessageDTO messageDTO) {
         try {
             String jsonMessage = objectMapper.writeValueAsString(messageDTO);
             redisTemplate.convertAndSend(channel, jsonMessage);

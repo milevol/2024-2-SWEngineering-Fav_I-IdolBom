@@ -94,7 +94,12 @@ const TicketStack = () => {
 
 const ChatStack = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+          initialRouteName="ChatListScreen"
+          screenOptions={{
+            headerShown: false
+          }}
+        >
       <Stack.Screen
         name="ChatListScreen"
         component={ChatListScreen}
@@ -143,6 +148,7 @@ const RecruitStack = () => {
 
 export default function App() {
   return (
+   <RecoilRoot>
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Loading" component={LoadingScreen} />

@@ -54,7 +54,21 @@ export default function BottomBar() {
          }
        })
      );
-   } else {
+   } else if (screenName === "Chat") {
+          navigation.dispatch(
+            CommonActions.navigate({
+              name: "Main",
+              params: {
+                screen: "Chat",
+                params: {
+                  screen: "ChatListScreen",
+                  params: { userID: kakaoUserID }
+                }
+              }
+            })
+          );
+        }
+   else {
      navigation.dispatch(
        CommonActions.navigate({
          name: "Main",

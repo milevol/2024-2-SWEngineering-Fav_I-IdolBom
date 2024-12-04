@@ -56,6 +56,7 @@ const LoginScreen = () => {
                 const text = await response.text(); // 응답을 텍스트로 먼저 받기
                 console.log('Server Response:', text); // 실제 응답 내용 확인
 
+
                 try {
                     const data = JSON.parse(text); // 텍스트를 JSON으로 파싱
                     if (data.code === 'SU') {

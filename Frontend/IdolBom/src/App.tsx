@@ -6,6 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import TopBar from './components/common/TopBar';
 import BottomBar from './components/common/BottomBar';
 import Header from './components/common/Header';
+import ChooseIdolManyScreen from './screens/choose/ChooseIdolManyScreen';
 import HomeScreen from './screens/HomeScreen';
 import ScheduleDetailScreen from './screens/ScheduleDetailScreen';
 import FindTicketAgentScreen from './screens/ticketing/FindTicketAgentScreen';
@@ -17,6 +18,9 @@ import LoginScreen from './screens/LoginScreen';
 import RecruitListScreen from "./screens/recruit/RecruitListScreen";
 import RecruitDetailScreen from "./screens/recruit/RecruitDetailScreen";
 import CreateRecruitScreen from "./screens/recruit/CreateRecruitScreen";
+import ReportScreen from './screens/report/ReportScreen';
+import LoadingScreen from './screens/LoadingScreen';
+
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -134,13 +138,26 @@ const RecruitStack = () => {
   );
 };
 
+
 export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Loading" component={LoadingScreen} />
+        {/*<Stack.Screen name="Login" component={LoginScreen} />*/}
+        <Stack.Screen name="Choose" component={ChooseIdolManyScreen} />
         <Stack.Screen name="Main" component={MainTabs} />
+
+        <Stack.Screen
+          name="ReportScreen"
+          component={ReportScreen}
+          options={{
+            header: () => <Header title="" />,
+            headerShown: true,
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
+

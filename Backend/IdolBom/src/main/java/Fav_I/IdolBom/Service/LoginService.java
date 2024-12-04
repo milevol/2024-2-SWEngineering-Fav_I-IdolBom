@@ -99,20 +99,23 @@ public class LoginService {
     }
 
 
-    public Optional<User> register(KakaoUserDTO kakaoUserDTO) {
+    public User register(KakaoUserDTO kakaoUserDTO) {
         Long id = kakaoUserDTO.getId();
         Optional<User> userInfo = userRepository.findById(id);
-
+        User newUser = new User();
         // Register
         log.info(userInfo.toString());
         if (userInfo.isEmpty()) {
-            User newUser = new User();
             newUser.setId(id);
             newUser.setUserName(kakaoUserDTO.getNickname());
             newUser.setProfileImage(kakaoUserDTO.getProfile_image());
+            newUser.setTrustScore(50);
             userRepository.save(newUser);
         }
-        return userInfo;
+        else {
+            newUser = userInfo.get();
+        }
+        return newUser;
     }
 
     public void setIdol(User user, int idol_id) {

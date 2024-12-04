@@ -50,8 +50,8 @@ public class LoginController {
             log.info(userInfo.toString());
 
             // 사용자 등록
-            loginService.register(userInfo);
-            session.setAttribute("userInfo", userInfo);
+            User loginUser = loginService.register(userInfo);
+            session.setAttribute("userInfo", loginUser);
             session.setMaxInactiveInterval(60 * 60 * 24); // 24시간
 
             // 응답 데이터 구성

@@ -15,8 +15,12 @@ import TicketScreen from './screens/ticketing/TicketScreen';
 import ChatListScreen from './screens/chat/ChatListScreen';
 import ChatScreen from './screens/chat/ChatScreen';
 import LoginScreen from './screens/LoginScreen';
+import RecruitListScreen from "./screens/recruit/RecruitListScreen";
+import RecruitDetailScreen from "./screens/recruit/RecruitDetailScreen";
+import CreateRecruitScreen from "./screens/recruit/CreateRecruitScreen";
 import ReportScreen from './screens/report/ReportScreen';
 import LoadingScreen from './screens/LoadingScreen';
+
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -31,6 +35,7 @@ const MainTabs = () => {
     >
       <Tab.Screen name="Home" component={HomeStack} />
       <Tab.Screen name="Tickets" component={TicketStack} />
+      <Tab.Screen name="Recruit" component={RecruitStack} />
       <Tab.Screen name="Chat" component={ChatStack} />
     </Tab.Navigator>
   );
@@ -103,6 +108,33 @@ const ChatStack = () => {
         }}
       />
     </Stack.Navigator>
+  );
+};
+const RecruitStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Recruit"
+        component={RecruitListScreen}
+        options={{
+          header: () => <TopBar />,
+        }}
+      />
+      <Stack.Screen
+        name="RecruitDetail"
+        component={RecruitDetailScreen}
+        options={{
+          header: () => <Header title="동행 상세정보" />,
+        }}
+      />
+     <Stack.Screen
+            name="CreateRecruit"
+            component={CreateRecruitScreen}
+            options={{
+              header: () => <Header title="동행 만들기" />,
+            }}
+          />
+   </Stack.Navigator>
   );
 };
 

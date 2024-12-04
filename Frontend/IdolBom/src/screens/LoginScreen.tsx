@@ -18,6 +18,7 @@ const LoginScreen = () => {
   const [showWebView, setShowWebView] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
+  const [isProcessing, setIsProcessing] = useState(false);//
 
   const clearWebViewCookiesAndCache = async () => {
     try {
@@ -35,42 +36,48 @@ const LoginScreen = () => {
   };
 
   const handleNavigationStateChange = (event: any) => {
-    if (event.url.startsWith(REDIRECT_URL)) {
-      const urlParams = new URLSearchParams(event.url.split('?')[1]);
-      const code = urlParams.get('code');
-      console.log('Authorization Code:', code);
+      if (event.url.startsWith(REDIRECT_URL) && !isProcessing) {  // 조건 추가
+          setIsProcessing(true);  // 처리 시작
+          const urlParams = new URLSearchParams(event.url.split('?')[1]);
+          const code = urlParams.get('code');
+          console.log('Authorization Code:', code);
 
-      if (code) {
-        setLoading(true);
+            if (code) {
+            console.log('fetch server code: ', code);
+            setLoading(true);
 
-        fetch(`${BACKEND_URL}/auth/callback`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ code }),
-        })
-          .then((response) => response.json())
-          .then((data) => {
-            if (data.code === 'SU') {
-              console.log('Login Successful:', data);
+            fetch(`${BACKEND_URL}/auth/callback?code=${code}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(async response => {
+                const text = await response.text(); // 응답을 텍스트로 먼저 받기
+                console.log('Server Response:', text); // 실제 응답 내용 확인
 
-              navigation.navigate('Main', { screen: 'Home' });
 
-             /*  navigation.navigate('Home', {
-                userInfo: data.userInfo,
-              }); */
+                try {
+                    const data = JSON.parse(text); // 텍스트를 JSON으로 파싱
+                    if (data.code === 'SU') {
+                        console.log('Login Successful:', data);
+                        navigation.navigate('Main', { screen: 'Home' });
+                    }
+                } catch (error) {
+                    console.error('JSON Parse Error:', error);
+                    console.error('Response was:', text);
+                }
+            })
+            .catch((error) => {
+                console.error('Fetch Error:', error);
+            })
+            .finally(() => {
+                setLoading(false);
+                setShowWebView(false);
+                setIsProcessing(false);
+            });
             }
-          })
-          .catch((error) => {
-            console.error('Fetch Error:', error);
-          })
-          .finally(() => {
-            setLoading(false);
-            setShowWebView(false);
-          });
       }
-    }
   };
 
   return (

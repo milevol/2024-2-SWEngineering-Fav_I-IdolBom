@@ -11,6 +11,7 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -55,8 +56,15 @@ public class RedisSubscriber implements MessageListener {
         try {
             //MessageSubDTO dto = objectMapper.readValue(publishMessage, MessageSubDTO.class);
 
+            //null체크 후 빈 리스트로 대체
             List<ChatRoomListGetResponse> chatRoomListGetResponseList = dto.getApplicantList();
+            if(chatRoomListGetResponseList == null) {
+                chatRoomListGetResponseList =  new ArrayList<>();
+            }
             List<ChatRoomListGetResponse> chatRoomListGetResponseListPartner = dto.getAgentList();
+            if(chatRoomListGetResponseListPartner == null) {
+                chatRoomListGetResponseListPartner =  new ArrayList<>();
+            }
 
             Long userId = dto.getApplicantID();
             Long partnerId = dto.getAgentID();

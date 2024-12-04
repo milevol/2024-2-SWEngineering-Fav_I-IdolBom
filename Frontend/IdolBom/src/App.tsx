@@ -143,8 +143,8 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Loading" component={LoadingScreen} />
-        {/*<Stack.Screen name="Login" component={LoginScreen} />*/}
         <Stack.Screen name="Choose" component={ChooseIdolManyScreen} />
         <Stack.Screen name="Main" component={MainTabs} />
 

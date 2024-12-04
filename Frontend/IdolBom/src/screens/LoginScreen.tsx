@@ -61,7 +61,7 @@ const LoginScreen = () => {
                     const data = JSON.parse(text); // 텍스트를 JSON으로 파싱
                     if (data.code === 'SU') {
                         console.log('Login Successful:', data);
-                        navigation.navigate('Main', { screen: 'Home' });
+                        navigation.navigate('Choose');
                     }
                 } catch (error) {
                     console.error('JSON Parse Error:', error);

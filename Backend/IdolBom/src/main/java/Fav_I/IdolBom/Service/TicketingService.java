@@ -50,6 +50,9 @@ public class TicketingService {
         newMatch.setTicketingID(ticketing_to_match);
         ticketingRepository.save(ticketing_to_match);
         matchingRepository.save(newMatch);
+
+        // create ChatRoom
+        chatRoomService.createChatRoom(newMatch);
         return newMatch;
     }
 

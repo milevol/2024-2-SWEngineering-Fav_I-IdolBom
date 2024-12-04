@@ -1,6 +1,8 @@
 package Fav_I.IdolBom.Service;
 
 import Fav_I.IdolBom.Config.RedisConfig;
+import Fav_I.IdolBom.Entity.Matching;
+import Fav_I.IdolBom.Entity.Recruitment;
 import Fav_I.IdolBom.Websocket.RedisSubscriber;
 import Fav_I.IdolBom.DTO.ChatRoomListGetResponse;
 import Fav_I.IdolBom.DTO.MessageSubDTO;
@@ -35,37 +37,37 @@ public class ChatRoomService {
         this.chatRoomRepository = chatRoomRepository;
     }
 
-    /**
-     * 새로운 채팅방을 생성하고 Redis 구독 채널을 추가
-     * @param chatRoomId 생성할 채팅방 ID
-     */
-    public ChatRoom createChatRoom(Integer chatRoomId) {
-        // 동적으로 채팅방 생성 - addChannel 메서드를 통해 Redis 구독 채널 추가
-        redisConfig.addChannel(redisMessageListenerContainer, redisSubscriber, String.valueOf(chatRoomId));
-        ChatRoom chatRoom = new ChatRoom();
-        chatRoom.setId(chatRoomId);
+    // 티켓팅 매칭 톡방 (1:1)
+    public ChatRoom createChatRoom(Matching matching) {
+        ChatRoom chatRoom = ChatRoom.builder()
+                .title("티켓팅 채팅방 (" + matching.getAgentID().getUserName() + ", " + matching.getApplicantID().getUserName())
+                .chatRoomImage(matching.getAgentID().getProfileImage())
+                .matchingID(matching).build();
+        ChatRoom created = chatRoomRepository.save(chatRoom);
 
-        return chatRoomRepository.save(chatRoom);
+        // 동적으로 채팅방 생성 - addChannel 메서드를 통해 Redis 구독 채널 추가
+        redisConfig.addChannel(redisMessageListenerContainer, redisSubscriber, String.valueOf(created.getId()));
+        return created;
     }
 
     // 테스트용 임시 채팅방 생성
-    public ChatRoom createTemporaryChatRoom(Long userId, Long agentId) {
-        Integer tempChatRoomId = Integer.valueOf(Long.toString(userId) + Long.toString(agentId));
-
-        ChatRoom chatRoom = createChatRoom(tempChatRoomId);
-
-        MessageSubDTO messageSubDto = MessageSubDTO.builder()
-                .applicantID(userId)
-                .agentID(agentId)
-                .build();
-        // 메시지발송 로직 추가
-        try {
-            redisSubscriber.sendRoomList(messageSubDto);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return chatRoom;
-    }
+//    public ChatRoom createTemporaryChatRoom(Long userId, Long agentId) {
+//        Integer tempChatRoomId = Integer.valueOf(Long.toString(userId) + Long.toString(agentId));
+//
+//        ChatRoom chatRoom = createChatRoom(tempChatRoomId);
+//
+//        MessageSubDTO messageSubDto = MessageSubDTO.builder()
+//                .applicantID(userId)
+//                .agentID(agentId)
+//                .build();
+//        // 메시지발송 로직 추가
+//        try {
+//            redisSubscriber.sendRoomList(messageSubDto);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return chatRoom;
+//    }
     /**
      * 신청인에게 채팅방 목록을 갱신합니다.
      * @param userId 신청인 ID

@@ -1,8 +1,6 @@
 package Fav_I.IdolBom.DTO;
-import java.time.Instant;
+import java.time.LocalDate;
 
-import Fav_I.IdolBom.Entity.Schedule;
-import Fav_I.IdolBom.Entity.User;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,9 +8,9 @@ import lombok.Setter;
 @Setter
 public class RecruitDTO {
     private String title;
-    private Instant startDate;
-    private Instant expiredDate;
-    private User creatorID;
+    private LocalDate startDate;
+    private LocalDate expiredDate;
+    private Long creatorID;
     private Integer maxParticipants;
     private String genderPreference;
     private String agePreference;

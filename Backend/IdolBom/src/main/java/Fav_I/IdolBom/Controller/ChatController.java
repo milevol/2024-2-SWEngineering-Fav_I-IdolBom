@@ -94,9 +94,9 @@ public class ChatController {
         chatRoomService.updateAgentChatRoomList(agentId, agentList);
     }
 
-    @PostMapping("/createTemporaryChatRoom")
-    public ChatRoom createTemporaryChatRoom(@RequestParam Long userId, @RequestParam Long agentId) {
-        return chatRoomService.createTemporaryChatRoom(userId, agentId);
-    }
+//    @PostMapping("/createTemporaryChatRoom")
+//    public ChatRoom createTemporaryChatRoom(@RequestParam Long userId, @RequestParam Long agentId) {
+//        return chatRoomService.createTemporaryChatRoom(userId, agentId);
+//    }
 }
 

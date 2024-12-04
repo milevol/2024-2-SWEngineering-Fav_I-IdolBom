@@ -6,13 +6,14 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.Instant;
+import java.time.LocalDate;
 
 @Getter
 @Setter
 @Entity
 public class Recruitment {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "recruitmentID", nullable = false)
     private Integer id;
 
@@ -23,11 +24,11 @@ public class Recruitment {
 
     @NotNull
     @Column(name = "startDate", nullable = false)
-    private Instant startDate;
+    private LocalDate startDate;
 
     @NotNull
     @Column(name = "expiredDate", nullable = false)
-    private Instant expiredDate;
+    private LocalDate expiredDate;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "creatorID")

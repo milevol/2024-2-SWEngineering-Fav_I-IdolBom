@@ -4,6 +4,7 @@ import Fav_I.IdolBom.Entity.ParticipantList;
 import Fav_I.IdolBom.Entity.User;
 import Fav_I.IdolBom.Repository.ParticipantListRepository;
 import Fav_I.IdolBom.Repository.ScheduleRepository;
+import Fav_I.IdolBom.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -20,6 +21,7 @@ public class RecruitService {
     private final RecruitRepository recruitRepository;
     private final ScheduleRepository scheduleRepository;
     private final ParticipantListRepository participantListRepository;
+    private final UserRepository userRepository;
 
     public List<Recruitment> getRecruitList() {
         return recruitRepository.findAll();
@@ -37,14 +39,13 @@ public class RecruitService {
         recruit.setAgePreference(recruitDTO.getAgePreference());
         recruit.setLocationPreference(recruitDTO.getLocationPreference());
         recruit.setAdditionalNote(recruitDTO.getAdditionalNote());
-        User creator = recruitDTO.getCreatorID();
-        recruit.setCreatorID(creator);
+        recruit.setCreatorID(userRepository.findById(recruitDTO.getCreatorID()).get());
         recruit.setScheduleID(scheduleRepository.findById(recruitDTO.getScheduleID()).get());
 
         Recruitment created = recruitRepository.save(recruit);
 
         ParticipantList participantList = new ParticipantList();
-        participantList.setUserID(creator);
+        participantList.setUserID(userRepository.findById(recruitDTO.getCreatorID()).get());
         participantList.setRecruitmentID(created);
         participantListRepository.save(participantList);
     }

@@ -36,10 +36,8 @@ public class RecruitController {
 
     // 스케줄 ID는 프론트에서 DTO로 받아오기, Creator는 세션에서 로그인 유저 가져와서 넣으면 됨.
     @PostMapping("/create")
-    public ResponseEntity<?> createRecruit(@RequestBody RecruitDTO recruitDTO, HttpSession session) {
+    public ResponseEntity<?> createRecruit(@RequestBody RecruitDTO recruitDTO) {
         try {
-            User loginUser = (User) session.getAttribute("loginUser");
-            recruitDTO.setCreatorID(loginUser);
             recruitService.createRecruit(recruitDTO);
             return ResponseEntity.ok("Recruit created");
         } catch (Exception e) {

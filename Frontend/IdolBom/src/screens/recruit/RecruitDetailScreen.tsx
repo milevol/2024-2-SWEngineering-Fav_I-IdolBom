@@ -98,10 +98,11 @@ const TagText = styled.Text`
 const JoinButton = styled.TouchableOpacity`
   width: 100%;
   padding: 15px;
-  background-color: #4096ff;
+  background-color: ${props => props.disabled ? '#898989' : '#4096ff'};
   border-radius: 10px;
   align-items: center;
   margin-top: 20px;
+  opacity: ${props => props.disabled ? 0.8 : 1};
 `;
 
 const JoinButtonText = styled.Text`
@@ -239,7 +240,13 @@ export default function RecruitDetailScreen({ route }) {
           */}
 
           {/* Join Button */}
-          <JoinButton>
+          <JoinButton
+            disabled={status === 1}
+            onPress={() => {
+              if (status !== 1) {
+                // 참여 로직
+              }
+            }}>
             <JoinButtonText>동행 참여</JoinButtonText>
           </JoinButton>
         </DetailCard>

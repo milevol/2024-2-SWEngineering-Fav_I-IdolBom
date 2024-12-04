@@ -148,7 +148,7 @@ const TagText = styled.Text`
 `;
 
 export default function RecruitListScreen() {
-  const [selectedFilter, setSelectedFilter] = useState("전체");
+  const [selectedFilter, setSelectedFilter] = useState("모집중");
   const navigation = useNavigation();
 
   const filters = ["전체", "모집중", "완료"];

@@ -160,7 +160,7 @@ const InfoText = styled.Text`
   margin-bottom: 3px;
 `;
 
-const labels = ["대리인 매칭", "티켓 예매", "결제금액 전달"];
+const labels = ["매칭중", "대리인 매칭", "결제금액 전달"];
 const customStyles = {
   stepIndicatorSize: 30,
   currentStepIndicatorSize: 40,
@@ -205,12 +205,13 @@ const ActionButtonText = styled.Text`
 
 export default function MatchTicketAgentScreen({ route }) {
   const { schedule } = route.params || {};
-  const reliabilityScore = 80;
-  const currentPosition = 5;
+  const reliabilityScore = 80; // 예시 데이터
+  const currentPosition = 1; // 예시 단계
+
   const navigation = useNavigation();
 
   const handleActionButtonPress = () => {
-    navigation.navigate('HomeScreen');
+    navigation.navigate('HomeScreen'); // 원하는 화면으로 이동
   };
 
   return (
@@ -270,6 +271,7 @@ export default function MatchTicketAgentScreen({ route }) {
     </ScreenContainer>
   );
 }
+
 
 const styles = StyleSheet.create({
   stepIndicatorContainer: {

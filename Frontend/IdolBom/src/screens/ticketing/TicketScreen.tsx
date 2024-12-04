@@ -65,36 +65,54 @@ export default function TicketScreen() {
   const navigation = useNavigation();
 
   // [api] API 데이터를 저장할 상태들
-  const [markedDates, setMarkedDates] = useState<{[key: string]: {marked: boolean; dotColor: string}}>({});
+  const [markedDates, setMarkedDates] = useState<{ [key: string]: { marked: boolean; dotColor: string } }>({});
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [currentDate, setCurrentDate] = useState(new Date());
 
+  // 모달 상태 추가
+  const [isModalVisible, setModalVisible] = useState(false);
+  const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
 
   const handleFindTicketPress = (schedule: Schedule) => {
-    const formattedSchedule = {
-      type: schedule.isTicketing ? '콘서트' : '일반 일정',
-      title: schedule.scheduleName,
-      date: schedule.scheduleDate.split('T')[0],
-      location: schedule.location || '장소 미정',
-    };
-
-    // navigation.getParent()로 Tab.Navigator에 접근하고,
-    // 그 다음 'Home' 탭으로 이동한 후 FindTicketAgent 스크린으로 이동
+    // `schedule` 객체를 그대로 전달
     navigation.getParent()?.navigate('Home', {
       screen: 'FindTicketAgent',
-      params: {
-        schedule: formattedSchedule
-      }
+      params: { schedule }, // schedule 전체 객체 전달
     });
   };
 
-  const handleProvideTicketPress = () => {
-    Alert.alert("매칭 요청", "이 티켓팅 대리를 신청하시겠습니까?");
-  };
-  // [api] 스케줄 데이터를 가져오는 함수
+const handleProvideTicketPress = async (schedule: Schedule) => {
+  try {
+    // 매칭 API 호출
+    const response = await fetch(`${BACKEND_URL}/ticketing/match/${schedule.id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`서버 요청 실패: ${response.status}`);
+    }
+
+    // 성공적으로 매칭 완료
+    Alert.alert('성공', '매칭이 완료되었습니다.');
+
+    // 매칭 완료된 스케줄을 리스트에서 제거
+    setSchedules((prevSchedules) =>
+      prevSchedules.filter((item) => item.id !== schedule.id)
+    );
+  } catch (error) {
+    console.error('매칭 요청 중 오류 발생:', error);
+    Alert.alert('오류', '티켓팅 매칭 요청에 실패했습니다.');
+  }
+};
+
+
+
+  // [api] "티켓팅 대리 구하기" 스케줄 데이터를 가져오는 함수
   const fetchSchedules = async (year: number, month: number) => {
     try {
-      // [api] 스케줄 데이터 API 호출
       const response = await fetch(`${BACKEND_URL}/1/schedule/exists?year=${year}&month=${month}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -105,12 +123,12 @@ export default function TicketScreen() {
       const ticketingSchedules = data.filter(schedule => schedule.isTicketing);
 
       // Create marked dates object
-      const newMarkedDates: {[key: string]: {marked: boolean; dotColor: string}} = {};
+      const newMarkedDates: { [key: string]: { marked: boolean; dotColor: string } } = {};
       ticketingSchedules.forEach(schedule => {
-        const dateStr = schedule.scheduleDate.split('T')[0]; // Format: YYYY-MM-DD
+        const dateStr = schedule.scheduleDate.split('T')[0];
         newMarkedDates[dateStr] = {
           marked: true,
-          dotColor: '#3e95ff'
+          dotColor: '#3e95ff',
         };
       });
 
@@ -122,19 +140,91 @@ export default function TicketScreen() {
     }
   };
 
-    // 월 변경 핸들러 추가
-    const handleMonthChange = (date: { year: number; month: number }) => {
-      setCurrentDate(new Date(date.year, date.month - 1));  // month는 0-based이므로 1을 빼줍니다
-    };
+  // [api] "티켓팅 대리하기" 스케줄 데이터를 가져오는 함수
+  const fetchConcertSchedules = async () => {
+    try {
+      // API 호출
+      const url = `${BACKEND_URL}/ticketing/list`;
+      console.log('Request URL:', url);
+
+      const response = await fetch(url);
+      console.log('Response status:', response.status);
+
+      if (!response.ok) {
+        if (response.status === 500) {
+          // 500 에러인 경우 처리
+          setSchedules([]); // 스케줄 비우기
+          return;
+        }
+        throw new Error(`Network response was not ok. Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // "ticketing_list"에서 필요한 데이터를 추출
+      const ticketingList = data.ticketing_list.map((item: any) => ({
+        id: item.id,
+        scheduleName: item.scheduleID?.scheduleName || '스케줄 이름 없음',
+        scheduleDate: item.scheduleID?.scheduleDate || '날짜 정보 없음',
+        location: item.scheduleID?.location || '장소 미정',
+        applicantID: item.applicantID || {},
+        ticketNum: item.ticketNum || 0,
+        seatingType: item.seatingType || '미정',
+        requestMessage: item.requestMessage || '없음',
+      }));
+
+      console.log('Filtered schedules:', ticketingList);
+
+      setSchedules(ticketingList); // 가져온 스케줄 리스트 저장
+    } catch (error) {
+//       console.error('Error fetching concert schedules:', error);
+//       setSchedules([]); // 스케줄 비우기
+//       Alert.alert('Error', '콘서트 스케줄 리스트를 가져오는데 실패했습니다.');
+    }
+  };
 
 
-  // [api] 컴포넌트 마운트 시와 월 변경 시 API 호출
+
+useEffect(() => {
+  if (activeToggle === '하기') {
+    console.log('Fetching concert schedules...');
+    fetchConcertSchedules();
+  }
+}, [activeToggle]);
+
+
+
+// "하기" 탭 활성화 시 호출
+useEffect(() => {
+  if (activeToggle === '하기') {
+    fetchConcertSchedules();
+  }
+}, [activeToggle]);
+
+
+  // "하기" 탭 활성화 시 호출
   useEffect(() => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth() + 1; // JavaScript months are 0-based
-    fetchSchedules(year, month);
-  }, [currentDate]);
+    if (activeToggle === '하기') {
+      fetchConcertSchedules();
+    }
+  }, [activeToggle]);
 
+
+  // 월 변경 핸들러 추가
+  const handleMonthChange = (date: { year: number; month: number }) => {
+    setCurrentDate(new Date(date.year, date.month - 1)); // month는 0-based
+  };
+
+  // "구하기" 탭에서 데이터 로드
+  useEffect(() => {
+    if (activeToggle === '구하기') {
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth() + 1;
+      fetchSchedules(year, month);
+    } else if (activeToggle === '하기') {
+      fetchConcertSchedules();
+    }
+  }, [activeToggle, currentDate]);
 
   // [api] API 응답 타입 정의
   interface Schedule {
@@ -146,6 +236,7 @@ export default function TicketScreen() {
     description: string;
     location: string | null;
     isTicketing: boolean;
+    scheduleType?: string; // "콘서트", "뮤지컬", 등등
   }
 
   return (
@@ -179,52 +270,48 @@ export default function TicketScreen() {
             />
           </CalendarContainer>
           <ScrollableScheduleContainer>
-            {/* [api] API로 받아온 스케줄 데이터 렌더링 */}
-            {schedules.map((schedule) => (
-              <ScheduleCard
-                key={schedule.id}
-                title={schedule.scheduleName}
-                details={`${schedule.scheduleDate.split('T')[0]}, ${schedule.location || '장소 미정'}`}
-                onPress={() => handleFindTicketPress(schedule)}
-                isTicketScreen={true}
-              />
-            ))}
+            {schedules.length > 0 ? (
+              schedules.map((schedule) => (
+                <ScheduleCard
+                  key={schedule.id}
+                  title={schedule.scheduleName}
+                  details={`${schedule.scheduleDate?.split('T')[0] || '날짜 없음'}, ${schedule.location || '장소 미정'}`}
+                  onPress={() => handleFindTicketPress(schedule)}
+                  isTicketScreen={true}
+                />
+              ))
+            ) : (
+              <View style={{ alignItems: 'center', marginTop: 20 }}>
+                <ToggleText selected={false}>대리할 수 있는 스케줄이 없어요.</ToggleText>
+              </View>
+            )}
           </ScrollableScheduleContainer>
         </View>
       ) : (
         <ScrollView contentContainerStyle={{ paddingTop: 60, paddingBottom: 100 }}>
-          <ScheduleCard
-            title="대리 구함 - 콘서트 C"
-            details="2023-11-20, 대구 공연장"
-            onPress={handleProvideTicketPress}
-            isTicketScreen={true}
-          />
-          <ScheduleCard
-            title="대리 구함 - 콘서트 D"
-            details="2023-12-05, 제주 공연장"
-            onPress={handleProvideTicketPress}
-            isTicketScreen={true}
-          />
-           <ScheduleCard
-             title="대리 구함 - 콘서트 D"
-             details="2023-12-05, 제주 공연장"
-             onPress={handleProvideTicketPress}
-             isTicketScreen={true}
-           />
-          <ScheduleCard
-            title="대리 구함 - 콘서트 D"
-            details="2023-12-05, 제주 공연장"
-            onPress={handleProvideTicketPress}
-            isTicketScreen={true}
-          />
-          <ScheduleCard
-            title="대리 구함 - 콘서트 D"
-            details="2023-12-05, 제주 공연장"
-            onPress={handleProvideTicketPress}
-            isTicketScreen={true}
-          />
+          {schedules.length > 0 ? (
+            schedules.map((schedule) => (
+              <ScheduleCard
+                key={schedule.id}
+                title={schedule.scheduleName}
+                details={`${
+                  schedule.scheduleDate?.split('T')[0] || '날짜 없음'
+                }, ${schedule.location || '장소 미정'}`}
+                onPress={() => handleProvideTicketPress(schedule)}
+                isTicketScreen={true}
+              />
+            ))
+          ) : (
+            <View style={{ alignItems: 'center', marginTop: 20 }}>
+              <ToggleText selected={false}>대리할 수 있는 티켓팅이 없어요.</ToggleText>
+            </View>
+          )}
         </ScrollView>
       )}
     </ScreenContainer>
   );
-}
+
+
+
+  }
+

@@ -3,14 +3,16 @@ package Fav_I.IdolBom.Entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.Hibernate;
 
 import java.util.Objects;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Embeddable
 public class ParticipantListId implements java.io.Serializable {
     private static final long serialVersionUID = 8625574425690214356L;

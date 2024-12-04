@@ -1,6 +1,7 @@
 package Fav_I.IdolBom.Service;
 
 import Fav_I.IdolBom.Entity.ParticipantList;
+import Fav_I.IdolBom.Entity.ParticipantListId;
 import Fav_I.IdolBom.Entity.User;
 import Fav_I.IdolBom.Repository.ParticipantListRepository;
 import Fav_I.IdolBom.Repository.ScheduleRepository;
@@ -29,25 +30,34 @@ public class RecruitService {
     }
 
     public void createRecruit(RecruitDTO recruitDTO) {
-        Recruitment recruit = new Recruitment();
-        recruit.setTitle(recruitDTO.getTitle());
-        recruit.setStartDate(LocalDate.from(recruitDTO.getStartDate()));
-        recruit.setExpiredDate(recruitDTO.getExpiredDate());
-        recruit.setMaxParticipants(recruitDTO.getMaxParticipants());
-        recruit.setCurrentParticipants(1); // Creator 1명
-        recruit.setStatus((byte) 0); // 상태 : 모집 진행중
-        recruit.setGenderPreference(recruitDTO.getGenderPreference());
-        recruit.setAgePreference(recruitDTO.getAgePreference());
-        recruit.setLocationPreference(recruitDTO.getLocationPreference());
-        recruit.setAdditionalNote(recruitDTO.getAdditionalNote());
-        recruit.setCreatorID(userRepository.findById(recruitDTO.getCreatorID()).get());
-        recruit.setScheduleID(scheduleRepository.findById(recruitDTO.getScheduleID()).get());
+        Recruitment recruit = Recruitment.builder()
+                .title(recruitDTO.getTitle())
+                .startDate(recruitDTO.getStartDate())
+                .expiredDate(recruitDTO.getExpiredDate())
+                .maxParticipants(recruitDTO.getMaxParticipants())
+                .currentParticipants(1)
+                .status((byte) 0)
+                .genderPreference(recruitDTO.getGenderPreference())
+                .agePreference(recruitDTO.getAgePreference())
+                .locationPreference(recruitDTO.getLocationPreference())
+                .additionalNote(recruitDTO.getAdditionalNote())
+                .creatorID(userRepository.findById(recruitDTO.getCreatorID()).get())
+                .scheduleID(scheduleRepository.findById(recruitDTO.getScheduleID()).get())
+                .build();
 
         Recruitment created = recruitRepository.save(recruit);
 
-        ParticipantList participantList = new ParticipantList();
-        participantList.setUserID(userRepository.findById(recruitDTO.getCreatorID()).get());
-        participantList.setRecruitmentID(created);
+        ParticipantListId participantListId = ParticipantListId.builder()
+                .userID(recruitDTO.getCreatorID())
+                .recruitmentID(created.getId())
+                .build();
+
+        ParticipantList participantList = ParticipantList.builder()
+                .id(participantListId)
+                .userID(created.getCreatorID())
+                .recruitmentID(created)
+                .build();
+
         participantListRepository.save(participantList);
     }
 

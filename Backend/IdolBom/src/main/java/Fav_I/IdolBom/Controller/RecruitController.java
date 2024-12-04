@@ -7,6 +7,7 @@ import Fav_I.IdolBom.Entity.User;
 import Fav_I.IdolBom.Service.RecruitService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,11 +38,18 @@ public class RecruitController {
     // 스케줄 ID는 프론트에서 DTO로 받아오기, Creator는 세션에서 로그인 유저 가져와서 넣으면 됨.
     @PostMapping("/create")
     public ResponseEntity<?> createRecruit(@RequestBody RecruitDTO recruitDTO) {
+        Map<String, Object> response = new LinkedHashMap<>();
+
         try {
             recruitService.createRecruit(recruitDTO);
-            return ResponseEntity.ok("Recruit created");
+            response.put("code", "SU");
+            response.put("message", "Recruits created successfully.");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+
         } catch (Exception e) {
-            return ResponseEntity.status(400).body(e.getMessage());
+            response.put("code", "Error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 

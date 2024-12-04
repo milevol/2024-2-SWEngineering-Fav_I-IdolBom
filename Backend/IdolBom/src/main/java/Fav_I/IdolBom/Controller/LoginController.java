@@ -93,18 +93,15 @@ public class LoginController {
     }
 
     @GetMapping("/my")
-    public ResponseEntity<?> getMyPage() {
+    public ResponseEntity<?> getMyPage(HttpSession session) {
         Map<String, Object> response = new LinkedHashMap<>();
-
-        // for test
-        User user = new User();
-        user.setId(12345L);
-        session.setAttribute("userInfo", user);
-        Object currentUser = session.getAttribute("userInfo");
-        Long user_id = ((User) currentUser).getId();
+        User loginUser = (User) session.getAttribute("userInfo");
 
         try {
-            User user_from_table = loginService.getMyInfo(user_id);
+            if (loginUser == null) {
+                throw new NullPointerException("user not found.");
+            }
+            User user_from_table = loginService.getMyInfo(loginUser.getId());
             if (user_from_table == null) {
                 throw new NullPointerException("no user found!");
             }

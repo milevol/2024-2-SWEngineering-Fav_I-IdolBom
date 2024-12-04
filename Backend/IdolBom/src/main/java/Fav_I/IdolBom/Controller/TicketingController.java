@@ -4,12 +4,14 @@ import Fav_I.IdolBom.DTO.TicketingFormDTO;
 import Fav_I.IdolBom.Entity.Matching;
 import Fav_I.IdolBom.Entity.Ticketing;
 import Fav_I.IdolBom.Entity.User;
+import Fav_I.IdolBom.Repository.TicketingRepository;
 import Fav_I.IdolBom.Service.TicketingService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.LinkedHashMap;
@@ -21,6 +23,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class TicketingController {
     private final TicketingService ticketingService;
+    private final TicketingRepository ticketingRepository;
 
     @GetMapping("/ticketing/list")
     public ResponseEntity<Map<String, Object>> getTicketingList() {
@@ -50,10 +53,11 @@ public class TicketingController {
         Object currentUser = session.getAttribute("userInfo");
 
         try {
-            ticketingService.submitTicketing((User)currentUser, schedule_id, formDTO);
+            Ticketing submittedTicketing = ticketingService.submitTicketing((User)currentUser, schedule_id, formDTO);
             response.put("code", "SU");
             response.put("message", "Success.");
             response.put("submitted_user", currentUser);
+            response.put("ticketing_id", submittedTicketing.getId());
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch(Exception e) {
             response.put("code", "Error");
@@ -89,6 +93,23 @@ public class TicketingController {
             response.put("code", "SU");
             response.put("message", "Success.");
             response.put("canceled", canceled);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            response.put("code", "Error");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    @GetMapping("/ticketing/status/{ticketing_id}")
+    public ResponseEntity<?> getTicketingStatus(@PathVariable("ticketing_id") int ticketing_id) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        try {
+            Ticketing ticketing = ticketingRepository.findById(ticketing_id).orElseThrow(() -> new NullPointerException("Ticketing not found"));
+            response.put("code", "SU");
+            response.put("message", "Ticketing Status found Succeed.");
+            response.put("ticketing_id", ticketing_id);
+            response.put("ticketing_status", ticketing.getTicketingStatus());
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             response.put("code", "Error");

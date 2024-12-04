@@ -1,13 +1,12 @@
 package Fav_I.IdolBom.Controller;
 
-import Fav_I.IdolBom.Entity.Ticketing;
+import Fav_I.IdolBom.Entity.*;
 import Fav_I.IdolBom.Repository.ChatRoomRepository;
+import Fav_I.IdolBom.Repository.MatchingRepository;
+import Fav_I.IdolBom.Repository.TicketingRepository;
 import Fav_I.IdolBom.Websocket.MessagePublisher;
 import Fav_I.IdolBom.DTO.ChatMessageDTO;
 import Fav_I.IdolBom.DTO.ChatRoomListGetResponse;
-import Fav_I.IdolBom.Entity.ChatRoom;
-import Fav_I.IdolBom.Entity.Message;
-import Fav_I.IdolBom.Entity.User;
 import Fav_I.IdolBom.Repository.UserRepository;
 import Fav_I.IdolBom.Service.ChatMessageService;
 import Fav_I.IdolBom.Service.ChatRoomService;
@@ -33,12 +32,15 @@ public class ChatController {
     private ChatMessageService chatMessageService;
     @Autowired
     private ChatRoomService chatRoomService;
-    //추가
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private ChatRoomRepository chatRoomRepository;
+    @Autowired
+    private MatchingRepository matchingRepository;
+    @Autowired
+    private TicketingRepository ticketingRepository;
 
     @MessageMapping("/send") // 클라이언트에서 /pub/send로 메시지를 보내면
     //@SendTo("/sub/chat/{chatRoomID}")  // /sub/chat로 메시지를 보낸다
@@ -67,21 +69,21 @@ public class ChatController {
     }
 */
     @PostMapping("/feedback")
-    public ResponseEntity<String> submitFeedback(@RequestParam Long sellerId, @RequestParam int feedback) {
-        User seller = userRepository.findById(sellerId)
+    public ResponseEntity<String> submitFeedback(@RequestParam Integer RoomId, @RequestParam int feedback) {
+        Matching matching = chatRoomRepository.findById(RoomId).get().getMatchingID();
+        Ticketing ticketing = ticketingRepository.findById(matching.getId()).get();
+        User seller = userRepository.findById(matching.getAgentID().getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Seller not found"));
 
-        // feedback 값이 1이면 trustScore +1, 0이면 trustScore -1
-        if (feedback == 1) {
-            seller.setTrustScore(seller.getTrustScore() + 1);
-        } else if (feedback == 0) {
-            seller.setTrustScore(seller.getTrustScore() - 1);
-        } else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid feedback value");
-        }
+        // 결제 완료로 상태 변경
+        ticketing.setTicketingStatus(2);
+        ticketingRepository.save(ticketing);
 
+        // feedback 값이 1이면 trustScore +1, 0이면 trustScore -1
+        seller.setTrustScore((feedback == 1) ? seller.getTrustScore() + 1 : seller.getTrustScore() - 1);
         userRepository.save(seller);  // 업데이트된 trustScore를 저장
-        return ResponseEntity.ok("Feedback submitted successfully");
+
+        return ResponseEntity.ok("Feedback submitted successfully. TicketingStatus Changed.");
     }
 
     @PostMapping("/updateApplicantChatRoomList")

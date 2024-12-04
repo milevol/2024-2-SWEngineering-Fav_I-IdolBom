@@ -29,14 +29,14 @@ public class TicketingService {
         return ticketingRepository.findNotMatched();
     }
 
-    public void submitTicketing(User currentUser, int schedule_id, TicketingFormDTO formDTO) {
+    public Ticketing submitTicketing(User currentUser, int schedule_id, TicketingFormDTO formDTO) {
         Ticketing ticketing = new Ticketing();
         ticketing.setApplicantID(userRepository.findById(currentUser.getId()).get());
         ticketing.setScheduleID(scheduleRepository.findById(schedule_id).get());
         ticketing.setTicketNum(formDTO.getTicketNum());
         ticketing.setSeatingType(formDTO.getSeatingType());
         ticketing.setRequestMessage(formDTO.getRequestMessage());
-        ticketingRepository.save(ticketing);
+        return ticketingRepository.save(ticketing);
     }
 
     @Transactional

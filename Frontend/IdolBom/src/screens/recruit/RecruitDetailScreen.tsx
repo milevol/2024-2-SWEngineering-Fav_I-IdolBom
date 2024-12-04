@@ -11,7 +11,7 @@ const Container = styled.View`
 
 const DetailCard = styled.View`
   width: 358px;
-  height: 600px;
+  height: 500px;
   background-color: #ffffff;
   border-radius: 20px;
   box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.25);
@@ -111,7 +111,63 @@ const JoinButtonText = styled.Text`
 `;
 
 export default function RecruitDetailScreen({ route }) {
-  const { title, details } = route.params;
+  const {
+      title,
+      details,
+      status,
+      genderPreference,
+      agePreference,
+      locationPreference,
+      additionalNote,
+      currentParticipants,
+      maxParticipants,
+      startDate,
+      expiredDate,
+      scheduleName
+    } = route.params;
+
+  const genderValueToLabel = {
+    'all': '모든 성별',
+    'female': '여자만',
+    'male': '남자만'
+  };
+
+  const locationValueToLabel = {
+    'seoul': '서울',
+    'gyeonggi': '경기',
+    'daegu': '대구',
+    'busan': '부산',
+    'gwangju': '광주'
+  };
+
+  const ageValueToLabel = {
+    'all': '연령 무관',
+    '10': '10대',
+    '20': '20대',
+    '30': '30대',
+    '40': '40대',
+    '50': '50대',
+    '60': '60대',
+    '70': '70대 이상'
+  };
+
+  // value를 label로 변환하는 함수들
+  const getGenderLabel = (value: string) => genderValueToLabel[value] || value;
+  const getLocationLabel = (value: string) => locationValueToLabel[value] || value;
+  const getAgeLabel = (value: string) => ageValueToLabel[value] || value;
+
+  const StatusButtonStyle = styled.View`
+      padding: 5px 10px;
+      background-color: ${status === 0 ? '#e8f4fc' : '#EDEDED'};
+
+      border-radius: 15px;
+    `;
+
+    const StatusTextStyle = styled.Text`
+      font-family: "NanumSquareRoundR";
+      font-size: 14px;
+      color: ${status === 0 ? '#4096ff' : '#5F5F5F'};
+    `;
 
   return (
     <Container>
@@ -120,21 +176,28 @@ export default function RecruitDetailScreen({ route }) {
           {/* Title and Status */}
           <TitleContainer>
             <Title>{title}</Title>
-            <StatusButton>
-              <StatusText>모집중</StatusText>
-            </StatusButton>
+            <StatusButtonStyle>
+              <StatusTextStyle>
+                {status === 0 ? "모집중" : "완료"}
+              </StatusTextStyle>
+            </StatusButtonStyle>
           </TitleContainer>
 
           {/* Schedule Info */}
           <Section>
             <SectionTitle>관련된 스케줄 정보</SectionTitle>
-            <SectionText>{details}</SectionText>
+            <SectionText>{scheduleName}</SectionText>
           </Section>
 
           {/* Recruitment Period */}
           <Section>
             <SectionTitle>모집 기간</SectionTitle>
-            <SectionText>시작일 ~ 종료일</SectionText>
+            <SectionText>
+                {startDate === expiredDate
+                    ? startDate
+                    : `${startDate} ~ ${expiredDate}`}
+
+            </SectionText>
           </Section>
 
           {/* Participants Info */}
@@ -142,7 +205,7 @@ export default function RecruitDetailScreen({ route }) {
             <SectionTitle>현재 인원/최대 인원 명</SectionTitle>
             <SectionRow>
               <Icon source={require("../../assets/images/people_icon.png")} />
-              <SectionText>3/6</SectionText>
+              <SectionText>{`${currentParticipants}/${maxParticipants}`}</SectionText>
             </SectionRow>
           </Section>
 
@@ -150,13 +213,13 @@ export default function RecruitDetailScreen({ route }) {
           <Section>
             <TagContainer>
               <Tag>
-                <TagText>모든 성별</TagText>
+                <TagText>{getGenderLabel(genderPreference)}</TagText>
               </Tag>
               <Tag>
-                <TagText>희망 나이대</TagText>
+                <TagText>{getAgeLabel(agePreference)}</TagText>
               </Tag>
               <Tag>
-                <TagText>희망 지역</TagText>
+                <TagText>{getLocationLabel(locationPreference)}</TagText>
               </Tag>
             </TagContainer>
           </Section>
@@ -164,14 +227,16 @@ export default function RecruitDetailScreen({ route }) {
           {/* User Notes */}
           <Section>
             <SectionTitle>하고싶은 말</SectionTitle>
-            <SectionText>사용자가 간단히 작성한 하고싶은 말</SectionText>
+            <SectionText> {additionalNote === null || additionalNote === '' ? '없음' : additionalNote}</SectionText>
           </Section>
 
           {/* Rules */}
+          {/*
           <Section>
             <SectionTitle>규칙</SectionTitle>
             <SectionText>사용자가 작성한 간단한 규칙</SectionText>
           </Section>
+          */}
 
           {/* Join Button */}
           <JoinButton>

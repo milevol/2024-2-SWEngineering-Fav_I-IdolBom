@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
+import { useRecoilValue } from 'recoil';
+import { kakaoUserIDState } from '../../atoms/userAtom';
 import styled from 'styled-components/native';
 import { ScrollView, TextInput, TouchableOpacity, Text, Image, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import { Modal } from 'react-native';
 import { Calendar } from 'react-native-calendars';
+
 
 const Container = styled.View`
   flex: 1;
@@ -145,6 +148,9 @@ const TitleWithLogo = styled.Text`
 
 
 export default function CreateRecruitScreen({ navigation }) {
+
+  const kakaoUserID = useRecoilValue(kakaoUserIDState);
+  const [title, setTitle] = useState('');
   const [gender, setGender] = useState(null);
   const [peopleCnt, setPeopleCnt] = useState('2'); /*  희망 인원수 기본 시작값 2명  */
   const [region, setRegion] = useState('seoul');
@@ -155,6 +161,9 @@ export default function CreateRecruitScreen({ navigation }) {
   const [showPeriodCalendar, setShowPeriodCalendar] = useState(false); /* 모집기간 */
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [additionalNote, setAdditionalNote] = useState('');
+  const BACKEND_URL = process.env.BACKEND_URL;
+
 
 
   const genderOptions = [
@@ -217,7 +226,47 @@ const ageOptions = [
       }
     }
   };
+  const handleSubmit = async () => {
+    try {
+      const requestBody = {
+        title,
+        startDate,
+        expiredDate: endDate,
+        creatorID: kakaoUserID,  // Recoil에서 가져온 userID 사용
+        maxParticipants: parseInt(peopleCnt),
+        genderPreference: selectedGender,
+        agePreference: selectedAges.join(','),
+        locationPreference: region,
+        additionalNote,
+        scheduleID: 11   // scheduleID는 필요에 따라 적절한 값 설정
+      };
 
+      const response = await fetch(`${BACKEND_URL}/api/recruit/create`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      if (!response.ok) {
+        throw new Error('동행 만들기 실패');
+      }
+
+      const data = await response.json();
+      if(data.code === 'SU'){
+          navigation.navigate('Recruit');
+
+      } else {
+          Alert.alert('Error', data.message || '동행 만들기에 실패했습니다.');
+
+      }
+
+    } catch (error) {
+      console.error('Error creating recruit:', error);
+      Alert.alert('Error', '동행 만들기에 실패했습니다.');
+    }
+  };
   // 날짜 범위 계산 함수
   const getDatesInRange = (startDate, endDate) => {
     const dates = [];
@@ -238,13 +287,18 @@ const ageOptions = [
         <DetailCard>
           {/* 동행 모집 제목 */}
           <Section>
-            <Input placeholder="동행 모집 제목을 작성해주세요." />
+            <Input
+                placeholder="동행 모집 제목을 작성해주세요."
+                value={title}
+                onChangeText={setTitle}
+             />
           </Section>
 
           {/* 관련된 스케줄 정보 */}
-          <Section>
+          {/* <Section>
             <SectionTitle>관련된 스케줄 정보</SectionTitle>
           </Section>
+          */}
 
           {/* 모집 기간 */}
           <Section>
@@ -263,6 +317,7 @@ const ageOptions = [
           </Section>
 
           {/* 모임 날짜 */}
+          {/*
           <CalendarSection>
             <TouchableOpacity
                 style={{ flexDirection: 'row', alignItems: 'center' }}
@@ -274,6 +329,7 @@ const ageOptions = [
                 </TitleWithLogo>
               </TouchableOpacity>
           </CalendarSection>
+          */}
 
           {/* 모집 인원 */}
           <PeopleSection>
@@ -439,11 +495,17 @@ const ageOptions = [
                 <SectionTitle>하고 싶은 말</SectionTitle>
                 <HintText>(선택)</HintText>
             </TitleContainer>
-            <Input placeholder="동행원들에게 하고 싶은 말을 간단히 작성해주세요." />
+
+            <Input
+                placeholder="동행원들에게 하고 싶은 말을 간단히 작성해주세요."
+                value={additionalNote}
+                onChangeText={setAdditionalNote}
+             />
           </Section>
 
 
           {/* 한줄 규칙 */}
+          {/*
           <Section>
             <TitleContainer>
               <SectionTitle>한줄 규칙 </SectionTitle>
@@ -451,14 +513,9 @@ const ageOptions = [
             </TitleContainer>
             <Input placeholder="동행원들과 지키고 싶은 규칙을 작성해주세요." />
           </Section>
-
+           */}
           {/* 동행 만들기 버튼 */}
-          <SubmitButton onPress={() => {
-              // 여기에 나중에 백엔드 연동 로직이 들어갈 자리
-
-              // RecruitListScreen으로 이동
-              navigation.navigate('Recruit');
-          }}>
+          <SubmitButton onPress={handleSubmit}>
               <SubmitButtonText>동행 만들기</SubmitButtonText>
           </SubmitButton>
         </DetailCard>

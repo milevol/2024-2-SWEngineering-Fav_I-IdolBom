@@ -3,7 +3,6 @@ import { ScrollView } from 'react-native';
 import styled from 'styled-components/native';
 import { useNavigation } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
-
 import ChanwonImage from '../../assets/images/chanwon.svg';
 import DongwonImage from '../../assets/images/dongwon.svg';
 import HwijaeImage from '../../assets/images/hwijae.svg';
@@ -15,32 +14,68 @@ import TwoImage from '../../assets/images/2.svg';
 import ThreeImage from '../../assets/images/3.svg';
 
 const idols = [
-  { name: '이찬원', image: ChanwonImage },
-  { name: '장민호', image: MinhoImage },
-  { name: '임영웅', image: YoungungImage },
-  { name: '영탁', image: YoungtakImage },
-  { name: '정동원', image: DongwonImage },
-  { name: '김희재', image: HwijaeImage },
-  { name: '임영우', image: OneImage },
-  { name: '임여웅', image: TwoImage },
-  { name: '임영움', image: ThreeImage },
+  { id: 1, name: '임영웅', image: YoungungImage },
+  { id: 2, name: '장민호', image: MinhoImage },
+  { id: 3, name: '이찬원', image: ChanwonImage },
+  { id: 4, name: '영탁', image: YoungtakImage },
+  { id: 5, name: '정동원', image: DongwonImage },
+  { id: 6, name: '김희재', image: HwijaeImage },
+  { id: 7, name: '임영우', image: OneImage },
+  { id: 8, name: '임여웅', image: TwoImage },
+  { id: 9, name: '임영움', image: ThreeImage },
 ];
 
 export default function IdolSelection() {
   const [selectedIdol, setSelectedIdol] = useState(null);
   const navigation = useNavigation(); // Navigation 객체 가져오기
 
+  const BACKEND_URL = process.env.BACKEND_URL;
+
   const handleSelect = (idol) => {
     setSelectedIdol(idol);
   };
 
-  const handleConfirmSelection = () => {
-    if (selectedIdol) {
-      navigation.navigate('Main', { screen: 'Home' }); // HomeScreen으로 이동
-    } else {
-      alert('아이돌을 선택해주세요!'); // 선택하지 않았을 경우 경고
+const handleConfirmSelection = async () => {
+  if (selectedIdol) {
+    try {
+      const response = await fetch(`${BACKEND_URL}/idol/${selectedIdol.id}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json', // JSON 응답을 명시적으로 요청
+        },
+      });
+
+      if (!response.ok) {
+        // 응답 Content-Type 확인
+        const contentType = response.headers.get('Content-Type');
+        if (contentType && contentType.includes('application/json')) {
+          // JSON 형식 응답 처리
+          const errorData = await response.json();
+          console.error('Server Error (JSON):', errorData);
+          alert(`서버 오류: ${errorData.message || '서버에서 문제가 발생했습니다.'}`);
+        } else {
+          // HTML 형식 응답 처리
+          const errorText = await response.text();
+          console.error('Server Error (HTML):', errorText);
+          alert('서버에서 문제가 발생했습니다. 관리자에게 문의하세요.');
+        }
+        return;
+      }
+
+      // 정상 응답 처리
+      const data = await response.json();
+      console.log('API Response:', data);
+      navigation.navigate('Main', { screen: 'Home', idolData: data });
+    } catch (error) {
+      console.error('Fetch Error:', error);
+      alert('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
     }
-  };
+  } else {
+    alert('아이돌을 선택해주세요!');
+  }
+};
+
 
   return (
     <Container>

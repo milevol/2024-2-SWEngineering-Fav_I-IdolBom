@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useSetRecoilState } from 'recoil';
+import { kakaoUserIDState } from '../atoms/userAtom';
 import {
   View,
   Image,
@@ -18,7 +20,8 @@ const LoginScreen = () => {
   const [showWebView, setShowWebView] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
-  const [isProcessing, setIsProcessing] = useState(false);//
+  const [isProcessing, setIsProcessing] = useState(false);
+  const setKakaoUserID = useSetRecoilState(kakaoUserIDState);
 
   const clearWebViewCookiesAndCache = async () => {
     try {
@@ -61,6 +64,7 @@ const LoginScreen = () => {
                     const data = JSON.parse(text); // 텍스트를 JSON으로 파싱
                     if (data.code === 'SU') {
                         console.log('Login Successful:', data);
+                        setKakaoUserID(data.userInfo.id);
                         navigation.navigate('Choose');
                     }
                 } catch (error) {

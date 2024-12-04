@@ -8,7 +8,7 @@
         // WebSocket 연결 초기화
         function connect() {
             const chatRoomID = document.getElementById('chatRoomID').value;
-            const wsUrl = `ws://localhost:8080/ws/chat`;
+            const wsUrl = `http://localhost:8083/ws/chat`;
             socket = new WebSocket(wsUrl);
 
             socket.onopen = function () {
@@ -40,7 +40,7 @@
 
             // 서버의 REST API를 사용하여 Redis에 메시지 발행
             const request = new XMLHttpRequest();
-            request.open('POST', `http://localhost:8080/api/chat/send`, true);
+            request.open('POST', `http://localhost:8083/api/chat/send`, true);
             request.setRequestHeader('Content-Type', 'application/json');
             request.onload = function () {
                 if (request.status === 200) {

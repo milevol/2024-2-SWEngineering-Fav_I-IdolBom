@@ -32,19 +32,12 @@ public class ChatMessageService {
             // redis 에 메시지 저장 (실시간 접근용)
             redisTemplate.opsForList().rightPush(CHATMESSAGE_KEY + ":" + messageDTO.getChatRoomID(), messageDTO);
 
-            // 데이터베이스에 메시지 영구 저장
-            //Message newMessage = new Message();
-            //newMessage.setContent(messageDTO.getContent());
             ChatRoom chatRoom = chatRoomRepository.findById(messageDTO.getChatRoomID())
                     .orElseThrow(() -> new IllegalArgumentException("채팅방이 존재하지 않습니다."));
-            //newMessage.setChatRoomID(chatRoom);
+
             User sender = userRepository.findById(messageDTO.getSenderID())
                     .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
-            //newMessage.setSenderID(sender);
-            //newMessage.setChatRoomID(chatRoomRepository.findById(messageDTO.getChatRoomID())
-              //      .orElseThrow(() -> new IllegalArgumentException("채팅방이 존재하지 않습니다.")));
-            //newMessage.setSenderID(userRepository.findById(messageDTO.getSenderID())
-              //      .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다.")));
+
             Message message = messageDTO.toEntity(chatRoom, sender);
             chatMessageRepository.save(message);
         } catch (Exception e) {

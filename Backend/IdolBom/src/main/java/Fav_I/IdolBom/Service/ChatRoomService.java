@@ -6,6 +6,7 @@ import Fav_I.IdolBom.DTO.ChatRoomListGetResponse;
 import Fav_I.IdolBom.DTO.MessageSubDTO;
 import Fav_I.IdolBom.Entity.ChatRoom;
 import Fav_I.IdolBom.Repository.ChatRoomRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
@@ -49,7 +50,7 @@ public class ChatRoomService {
 
     // 테스트용 임시 채팅방 생성
     public ChatRoom createTemporaryChatRoom(Long userId, Long agentId) {
-        Integer tempChatRoomId = 123;
+        Integer tempChatRoomId = Integer.valueOf(Long.toString(userId) + Long.toString(agentId));
 
         ChatRoom chatRoom = createChatRoom(tempChatRoomId);
 
@@ -57,6 +58,12 @@ public class ChatRoomService {
                 .applicantID(userId)
                 .agentID(agentId)
                 .build();
+        // 메시지발송 로직 추가
+        try {
+            redisSubscriber.sendRoomList(messageSubDto);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return chatRoom;
     }
     /**

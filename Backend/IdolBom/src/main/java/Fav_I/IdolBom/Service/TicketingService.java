@@ -23,6 +23,7 @@ public class TicketingService {
     private final MatchingRepository matchingRepository;
     private final UserRepository userRepository;
     private final ScheduleRepository scheduleRepository;
+    private final ChatRoomService chatRoomService;
 
     public List<Ticketing> getTicketingList() {
         return ticketingRepository.findNotMatched();
@@ -68,6 +69,8 @@ public class TicketingService {
             return to_modify;
         }
     }
+
+    // 매칭 시 채팅방 생성 로직
 
     public List<Ticketing> getMyTicketingList(User user) {
         return ticketingRepository.findAllByApplicantID(user);

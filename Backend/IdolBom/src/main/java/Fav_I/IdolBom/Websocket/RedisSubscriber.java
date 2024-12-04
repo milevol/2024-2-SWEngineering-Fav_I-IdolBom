@@ -26,20 +26,20 @@ public class RedisSubscriber implements MessageListener {
     public void onMessage(Message message, byte[] pattern) {
         try {
             String publishMessage = new String(message.getBody());
-        sendMessage(publishMessage);
-        sendRoomList(publishMessage);
+            // 메시지 한번 파싱해 재사용
+            MessageSubDTO dto = objectMapper.readValue(publishMessage, MessageSubDTO.class);
+            sendMessage(dto);
+            sendRoomList(dto);
         } catch (Exception e) {
-            log.error("Exception {}", e);
+            log.error("Invalid Redis message format: {}", new String(message.getBody()), e);
         }
     }
 
     // redis에서 받은 메시지를 특정 채팅방에 발송
-    public void sendMessage(String publishMessage) {
+    public void sendMessage(MessageSubDTO dto) {
         try {
             // MessageSubDto에서 ChatMessageDTO를 추출하여 채팅방 구독자에게 발송
-            ChatMessageDTO chatMessage =
-                    objectMapper.readValue(publishMessage, MessageSubDTO.class).getChatMessageDTO();
-
+            ChatMessageDTO chatMessage = dto.getChatMessageDTO();
             // 채팅방을 구독한 클라이언트에게 메시지 발송
             messagingTemplate.convertAndSend(
                     "/sub/chat/room/" + chatMessage.getChatRoomID(), chatMessage
@@ -51,9 +51,9 @@ public class RedisSubscriber implements MessageListener {
     }
 
     // 채팅방 리스트를 최신화하여 발송
-    public void sendRoomList(String publishMessage) {
+    public void sendRoomList(MessageSubDTO dto) {
         try {
-            MessageSubDTO dto = objectMapper.readValue(publishMessage, MessageSubDTO.class);
+            //MessageSubDTO dto = objectMapper.readValue(publishMessage, MessageSubDTO.class);
 
             List<ChatRoomListGetResponse> chatRoomListGetResponseList = dto.getApplicantList();
             List<ChatRoomListGetResponse> chatRoomListGetResponseListPartner = dto.getAgentList();
@@ -72,7 +72,7 @@ public class RedisSubscriber implements MessageListener {
             );
 
         } catch (Exception e) {
-            log.error("Exception {}", e);
+            log.error("Error sending room list to WebSocket: {}",dto, e);
         }
     }
 }

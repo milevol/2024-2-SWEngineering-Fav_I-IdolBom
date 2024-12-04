@@ -1,5 +1,7 @@
 package Fav_I.IdolBom.Controller;
 
+import Fav_I.IdolBom.Entity.Ticketing;
+import Fav_I.IdolBom.Repository.ChatRoomRepository;
 import Fav_I.IdolBom.Websocket.MessagePublisher;
 import Fav_I.IdolBom.DTO.ChatMessageDTO;
 import Fav_I.IdolBom.DTO.ChatRoomListGetResponse;
@@ -35,25 +37,35 @@ public class ChatController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ChatRoomRepository chatRoomRepository;
+
     @MessageMapping("/send") // 클라이언트에서 /pub/send로 메시지를 보내면
-    @SendTo("/sub/chat/{chatRoomID}")  // /sub/chat로 메시지를 보낸다
-    public ChatMessageDTO sendMessage(ChatMessageDTO message) {
-        String channelName = "chat_" + message.getChatRoomID();
+    //@SendTo("/sub/chat/{chatRoomID}")  // /sub/chat로 메시지를 보낸다
+    public void sendMessage(ChatMessageDTO message) {
+        //메시지를 레디스와 db에 저장
+        chatMessageService.saveMessage(message);
+
+        // redis pub/sub으로 메시지 발행
+        String channelName = "chatroom:" + message.getChatRoomID();
         messagePublisher.publish(channelName, message.getContent());
-        return message;
+        //return message;
     }
-
+// chatroom 객체 대신 id 받아오게 수정해야 함
     @GetMapping("/history/{roomId}")
-    public List<Message> getChatHistory(@PathVariable("roomId") ChatRoom roomId) {
-        return chatMessageService.getChatHistory(roomId);
+    public List<Message> getChatHistory(@PathVariable("roomId") Integer roomId) {
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Chat room not found"));
+        //.get();
+        return chatMessageService.getChatHistory(chatRoom);
     }
-
+/*
+    //sendMessage와 로직 중복되어 제거
     @PostMapping("/save")
     public void saveMessage(@RequestBody ChatMessageDTO messageDTO) {
         chatMessageService.saveMessage(messageDTO);
     }
-
-    //추가
+*/
     @PostMapping("/feedback")
     public ResponseEntity<String> submitFeedback(@RequestParam Long sellerId, @RequestParam int feedback) {
         User seller = userRepository.findById(sellerId)

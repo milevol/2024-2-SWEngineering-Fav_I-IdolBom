@@ -21,6 +21,8 @@ import RecruitDetailScreen from "./screens/recruit/RecruitDetailScreen";
 import CreateRecruitScreen from "./screens/recruit/CreateRecruitScreen";
 import ReportScreen from './screens/report/ReportScreen';
 import LoadingScreen from './screens/LoadingScreen';
+import MyPageScreen from './screens/MyPageScreen';
+import ChatProfileScreen from './screens/chat/ChatProfileScreen';
 
 
 
@@ -39,6 +41,7 @@ const MainTabs = () => {
       <Tab.Screen name="Tickets" component={TicketStack} />
       <Tab.Screen name="Recruit" component={RecruitStack} />
       <Tab.Screen name="Chat" component={ChatStack} />
+      <Tab.Screen name="Profile" component={MyPageStack} />
     </Tab.Navigator>
   );
 };
@@ -114,9 +117,17 @@ const ChatStack = () => {
           headerShown: false
         }}
       />
+      <Stack.Screen
+        name="ChatProfile"
+        component={ChatProfileScreen}
+        options={{
+          headerShown: false
+        }}
+      />
     </Stack.Navigator>
   );
 };
+
 const RecruitStack = () => {
   return (
     <Stack.Navigator>
@@ -145,6 +156,19 @@ const RecruitStack = () => {
   );
 };
 
+const MyPageStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="MyPageScreen"
+        component={MyPageScreen}
+        options={{
+          header: () => <TopBar />,
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
 
 export default function App() {
   return (

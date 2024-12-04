@@ -176,6 +176,14 @@ const ChatScreen = () => {
     }
   };
 
+  // 프로필 클릭
+  const handleProfileClick = (senderId: string, senderName: string) => {
+    navigation.navigate('ChatProfile', {
+      userId: senderId,
+      nickname: senderName,
+    });
+  };
+
    return (
       <KeyboardAvoidingContainer behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={90}>
         <Header>
@@ -193,7 +201,12 @@ const ChatScreen = () => {
         <ScrollView ref={scrollViewRef} style={{ flex: 1 }} contentContainerStyle={{ paddingBottom: 100 }}>
           {messages.map((msg) => (
             <MessageRow key={msg.id} isSentByUser={msg.isSentByUser}>
-              {!msg.isSentByUser && <AvatarIcon name="account-circle" size={40} />}
+              {!msg.isSentByUser &&  (
+                  // [추가된 부분 2] 프로필 아이콘을 터치 가능하게 만듦
+                  <TouchableOpacity onPress={() => handleProfileClick(msg.id, msg.sender)}>
+                    <AvatarIcon name="account-circle" size={40} />
+                  </TouchableOpacity>
+              )}
               <MessageContainer>
                 {!msg.isSentByUser && <SenderName>{msg.sender}</SenderName>}
                 <MessageBubble isSentByUser={msg.isSentByUser}>

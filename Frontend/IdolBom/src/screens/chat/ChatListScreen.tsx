@@ -1,6 +1,6 @@
-// ChatListScreen.tsx
-import React from 'react';
-import { View, FlatList, StyleSheet, Text } from 'react-native';
+import React, { useState } from 'react';
+import { View, FlatList, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import styled from 'styled-components/native';
 import ChatRoomItem from '../../components/chat/ChatRoomItem';
 import { useNavigation } from '@react-navigation/native';
 
@@ -49,8 +49,35 @@ const mockData = [
   },
 ];
 
+const ToggleContainer = styled.View`
+  margin-top: 10px;
+  align-self: center;
+  width: 250px;
+  height: 40px;
+  flex-direction: row;
+  border: 1px solid #b3b3b3;
+  border-radius: 10px;
+  background: #ffffff;
+  margin-bottom: 10px;
+`;
+
+const ToggleButton = styled.TouchableOpacity<{ selected: boolean }>`
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  background-color: ${(props) => (props.selected ? '#3e95ff' : '#ffffff')};
+`;
+
+const ToggleText = styled.Text<{ selected: boolean }>`
+  font-family: 'NanumSquareRoundB';
+  font-size: 20px;
+  color: ${(props) => (props.selected ? '#ffffff' : '#727272')};
+`;
+
 const ChatListScreen: React.FC = () => {
   const navigation = useNavigation();
+  const [selectedTab, setSelectedTab] = useState<'all' | 'unread'>('all'); // 토글 상태 추가
 
   const renderItem = ({ item }: { item: typeof mockData[0] }) => (
     <ChatRoomItem
@@ -58,22 +85,31 @@ const ChatListScreen: React.FC = () => {
       lastMessage={item.lastMessage}
       schedule={item.schedule}
       unreadCount={item.unreadCount}
-      onPress={() => navigation.navigate('ChatScreen', { chatId: item.id, title: item.title })} // title 전달
+      onPress={() => navigation.navigate('ChatScreen', { chatId: item.id, title: item.title })}
     />
   );
+
+  const filteredData = selectedTab === 'all' ? mockData : mockData.filter((item) => item.unreadCount > 0); // 읽지 않은 채팅 필터링
 
   return (
     <View style={styles.container}>
       <Text style={styles.header}>채팅</Text>
+      <ToggleContainer>
+        <ToggleButton selected={selectedTab === 'all'} onPress={() => setSelectedTab('all')}>
+          <ToggleText selected={selectedTab === 'all'}>티켓팅</ToggleText>
+        </ToggleButton>
+        <ToggleButton selected={selectedTab === 'unread'} onPress={() => setSelectedTab('unread')}>
+          <ToggleText selected={selectedTab === 'unread'}>동행</ToggleText>
+        </ToggleButton>
+      </ToggleContainer>
       <FlatList
-        data={mockData}
+        data={filteredData}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
       />
     </View>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {

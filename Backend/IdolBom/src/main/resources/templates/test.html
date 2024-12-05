@@ -25,7 +25,7 @@
 
 <script>
     let stompClient = null;
-    let chatRoomID = [[${session.roomId}]];
+    let chatRoomID = 1234567891;
 
     function connect() {
         chatRoomID = document.getElementById('chatRoomID').value;
@@ -41,7 +41,7 @@
             console.log('Connected to WebSocket');
 
             // Subscribe to chat room messages
-            stompClient.subscribe('/sub/chat/room/' + chatRoomID, function (messageOutput) {
+            stompClient.subscribe('/sub/chat/' + chatRoomID, function (messageOutput) {
                 showMessage(JSON.parse(messageOutput.body).content);
             });
 
@@ -68,7 +68,7 @@
 
         const messagePayload = {
             chatRoomID: chatRoomID,
-            senderID: [[${session.senderId}]], // Replace with the sender's actual ID
+            senderID: 3817719045, // Replace with the sender's actual ID
             content: message,
             sendDate: new Date().toISOString()
         };

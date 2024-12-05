@@ -2,11 +2,13 @@ package Fav_I.IdolBom.Entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.Instant;
 
+@Data
 @Getter
 @Setter
 @Entity

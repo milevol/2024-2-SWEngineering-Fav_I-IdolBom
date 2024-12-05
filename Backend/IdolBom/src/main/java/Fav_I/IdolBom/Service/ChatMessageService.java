@@ -8,6 +8,7 @@ import Fav_I.IdolBom.Repository.ChatMessageRepository;
 import Fav_I.IdolBom.Repository.ChatRoomRepository;
 import Fav_I.IdolBom.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 // 메시지 송수신, 저장
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ChatMessageService {
 

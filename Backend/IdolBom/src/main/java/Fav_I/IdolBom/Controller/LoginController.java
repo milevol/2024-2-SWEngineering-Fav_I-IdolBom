@@ -5,6 +5,7 @@ import Fav_I.IdolBom.DTO.GetTokenDTO;
 import Fav_I.IdolBom.DTO.KakaoUserDTO;
 import Fav_I.IdolBom.Entity.Ticketing;
 import Fav_I.IdolBom.Entity.User;
+import Fav_I.IdolBom.Repository.UserRepository;
 import Fav_I.IdolBom.Service.LoginService;
 import Fav_I.IdolBom.Service.TicketingService;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
@@ -32,6 +33,8 @@ public class LoginController {
     private HttpSession session;
     @Autowired
     private TicketingService ticketingService;
+    @Autowired
+    private UserRepository userRepository;
 
 
     @PostMapping("/auth/callback")
@@ -95,23 +98,21 @@ public class LoginController {
     @GetMapping("/my")
     public ResponseEntity<?> getMyPage(HttpSession session) {
         Map<String, Object> response = new LinkedHashMap<>();
+        session.setAttribute("userInfo", userRepository.findById(3817719045L).get());
         User loginUser = (User) session.getAttribute("userInfo");
 
         try {
-            if (loginUser == null) {
+            User user = userRepository.findById(loginUser.getId()).orElse(null);
+            if (user == null) {
                 throw new NullPointerException("user not found.");
             }
-            User user_from_table = loginService.getMyInfo(loginUser.getId());
-            if (user_from_table == null) {
-                throw new NullPointerException("no user found!");
-            }
-            List<Ticketing> ticketingList = ticketingService.getMyTicketingList(user_from_table)
+            List<Ticketing> ticketingList = ticketingService.getMyTicketingList(user)
                     .stream()
                     .sorted(Comparator.comparingInt(Ticketing::getTicketingStatus))
                     .collect(Collectors.toList());
             response.put("code", "SU");
             response.put("message", "Success.");
-            response.put("userInfo", user_from_table);
+            response.put("userInfo", user);
             response.put("ticketingList", ticketingList);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {

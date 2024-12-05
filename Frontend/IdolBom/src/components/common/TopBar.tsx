@@ -111,9 +111,6 @@ export default function TopBar() {
             <DropdownItem onPress={() => handleItemPress('Option 2')}>
               <DropdownText>장민호</DropdownText>
             </DropdownItem>
-            <DropdownItem onPress={() => handleItemPress('Option 3')}>
-              <DropdownText>영탁</DropdownText>
-            </DropdownItem>
           </DropdownContainer>
         )}
       </View>

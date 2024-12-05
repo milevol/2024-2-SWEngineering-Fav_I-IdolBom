@@ -26,6 +26,7 @@ import ChatProfileScreen from './screens/chat/ChatProfileScreen';
 
 
 
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -175,10 +176,10 @@ export default function App() {
    <RecoilRoot>
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Loading" component={LoadingScreen} />
+        {/* <Stack.Screen name="Loading" component={LoadingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Choose" component={ChooseIdolManyScreen} />
-        <Stack.Screen name="Main" component={MainTabs} />
+        <Stack.Screen name="Main" component={MainTabs} />*/}
 
             <Stack.Screen
               name="ReportScreen"

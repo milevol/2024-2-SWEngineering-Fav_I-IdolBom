@@ -22,6 +22,8 @@ import CreateRecruitScreen from "./screens/recruit/CreateRecruitScreen";
 import ReportScreen from './screens/report/ReportScreen';
 import LoadingScreen from './screens/LoadingScreen';
 import MyPageScreen from './screens/MyPageScreen';
+import ChatProfileScreen from './screens/chat/ChatProfileScreen';
+
 
 
 
@@ -112,6 +114,13 @@ const ChatStack = () => {
       <Stack.Screen
         name="ChatScreen"
         component={ChatScreen}
+        options={{
+          headerShown: false
+        }}
+      />
+      <Stack.Screen
+        name="ChatProfile"
+        component={ChatProfileScreen}
         options={{
           headerShown: false
         }}

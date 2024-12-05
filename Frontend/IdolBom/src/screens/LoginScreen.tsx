@@ -29,7 +29,7 @@ const LoginScreen = () => {
       console.log('WebView cookies cleared');
     } catch (error) {
       console.error('Error clearing WebView cookies: ', error);
-    }닏ㄷㄴ
+    }
   }; */
 
   const handleLogin = async () => {

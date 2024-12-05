@@ -218,7 +218,7 @@ export default function MatchTicketAgentScreen({ route }) {
     <ScreenContainer>
       <BackgroundRectangle />
 
-      <ProfileImage source={{ uri: 'http://img1.kakaocdn.net/thumb/R640x640.q70/?fname=http://t1.kakaocdn.net/account_images/default_profile.jpeg' }} />
+      <ProfileImage source={{ uri: '' }} />
       <AgentNickname>박지형</AgentNickname>
 
       <IterationsButton onPress={() => console.log('Iterations Button Pressed')}>
@@ -254,7 +254,7 @@ export default function MatchTicketAgentScreen({ route }) {
         <InfoRow>
           <MaterialCommunityIcons name="email-newsletter" size={16} color="#898989" />
           <InfoText>대리인에게 할 말: {schedule?.message || '없음'}</InfoText>
-        </InfoRow>
+        박지형</InfoRow>
       </RequestContainer>
 
       <View style={styles.stepIndicatorContainer}>

@@ -21,6 +21,7 @@ import RecruitDetailScreen from "./screens/recruit/RecruitDetailScreen";
 import CreateRecruitScreen from "./screens/recruit/CreateRecruitScreen";
 import ReportScreen from './screens/report/ReportScreen';
 import LoadingScreen from './screens/LoadingScreen';
+import MyPageScreen from './screens/MyPageScreen';
 
 
 
@@ -39,6 +40,7 @@ const MainTabs = () => {
       <Tab.Screen name="Tickets" component={TicketStack} />
       <Tab.Screen name="Recruit" component={RecruitStack} />
       <Tab.Screen name="Chat" component={ChatStack} />
+      <Tab.Screen name="Profile" component={MyPageStack} />
     </Tab.Navigator>
   );
 };
@@ -117,6 +119,7 @@ const ChatStack = () => {
     </Stack.Navigator>
   );
 };
+
 const RecruitStack = () => {
   return (
     <Stack.Navigator>
@@ -145,16 +148,29 @@ const RecruitStack = () => {
   );
 };
 
+const MyPageStack = () => {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="MyPageScreen"
+        component={MyPageScreen}
+        options={{
+          header: () => <TopBar />,
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
 
 export default function App() {
   return (
    <RecoilRoot>
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Loading" component={LoadingScreen} />
+        {/* <Stack.Screen name="Loading" component={LoadingScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Choose" component={ChooseIdolManyScreen} />
-        <Stack.Screen name="Main" component={MainTabs} />
+        <Stack.Screen name="Main" component={MainTabs} />*/}
 
             <Stack.Screen
               name="ReportScreen"

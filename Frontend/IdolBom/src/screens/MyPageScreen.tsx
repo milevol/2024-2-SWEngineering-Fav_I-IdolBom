@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native';
 import styled from 'styled-components/native';
 import TicketingCard from '../components/mypage/TicketingCard';
@@ -19,14 +19,14 @@ const BackgroundRectangle = styled.View`
   border-radius: 40px;
 `;
 
-const ProfileImage = styled.View`
+const ProfileImage = styled.Image`
   position: absolute;
   width: 100px;
   height: 100px;
   left: 47px;
   top: 44px;
-  background-color: #d9d9d9;
   border-radius: 50px;
+  background-color: #d9d9d9;
 `;
 
 const Nickname = styled.Text`
@@ -118,57 +118,49 @@ const RecordText = styled.Text`
 `;
 
 export default function MyPageScreen() {
-  const reliabilityScore = 80;
+  const [userInfo, setUserInfo] = useState(null);
+  const [ticketingList, setTicketingList] = useState([]);
 
-  const mockTickets = [
-    {
-      id: '1',
-      title: '임영웅 겨울콘서트',
-      dateRange: '2024.11.10 ~ 2024.11.12',
-      meetingDate: '2024.12.12 목요일',
-      status: '매칭중',
-      attendance: '3/6',
-    },
-    {
-      id: '2',
-      title: '콘서트2',
-      dateRange: '2024.12.01 ~ 2024.12.02',
-      meetingDate: '2024.12.05 금요일',
-      status: '신청중',
-      attendance: '5/5',
-    },
-    {
-      id: '3',
-      title: '콘서트3',
-      dateRange: '2024.12.01 ~ 2024.12.02',
-      meetingDate: '2024.12.05 금요일',
-      status: '신청중',
-      attendance: '5/5',
-    },
-    {
-      id: '4',
-      title: '콘서트4',
-      dateRange: '2024.12.01 ~ 2024.12.02',
-      meetingDate: '2024.12.05 금요일',
-      status: '신청중',
-      attendance: '5/5',
-    },
-  ];
+   const BACKEND_URL = process.env.BACKEND_URL;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/my`);
+        const data = await response.json();
+        if (data.code === 'SU') {
+          setUserInfo(data.userInfo);
+          setTicketingList(data.ticketingList);
+        } else {
+          console.error('API Error:', data.message);
+        }
+      } catch (error) {
+        console.error('Network Error:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (!userInfo) {
+    return null; // 로딩 상태를 처리하거나 스켈레톤 UI 추가 가능
+  }
 
   return (
     <ScreenContainer>
       <BackgroundRectangle />
 
-      <ProfileImage />
-      <Nickname>내 닉네임</Nickname>
-      <Introduction>내 한줄 소개를 여기에 표시</Introduction>
+      {/* 프로필 정보 */}
+      <ProfileImage source={{ uri: userInfo.profileImage || 'https://via.placeholder.com/100' }} />
+      <Nickname>{userInfo.userName || '닉네임 없음'}</Nickname>
+      <Introduction>{userInfo.bio || '건강하세요!'}</Introduction>
 
-      {/* 신뢰도 섹션 */}
+      {/* 신뢰도 */}
       <ReliabilityContainer>
         <ReliabilityLabel>신뢰도</ReliabilityLabel>
-        <ReliabilityScore>{reliabilityScore}</ReliabilityScore>
+        <ReliabilityScore>{userInfo.trustScore || 0}</ReliabilityScore>
         <ReliabilityBarBackground>
-          <ReliabilityBarFill fillWidth={(reliabilityScore / 100) * 100} />
+          <ReliabilityBarFill fillWidth={(userInfo.trustScore || 0)} />
         </ReliabilityBarBackground>
       </ReliabilityContainer>
 
@@ -183,14 +175,14 @@ export default function MyPageScreen() {
           <RecordIcon />
           <RecordText>내 기록</RecordText>
         </RecordContainer>
-        {mockTickets.map((ticket) => (
+        {ticketingList.map((ticket) => (
           <TicketingCard
             key={ticket.id}
-            title={ticket.title}
-            dateRange={ticket.dateRange}
-            meetingDate={ticket.meetingDate}
-            status={ticket.status}
-            attendance={ticket.attendance}
+            title={ticket.scheduleID.scheduleName}
+            dateRange={new Date(ticket.scheduleID.scheduleDate).toLocaleDateString()}
+            meetingDate={ticket.scheduleID.description}
+            status={ticket.ticketingStatus === 0 ? '매칭중' : '완료'}
+            attendance={`${ticket.ticketNum}/6`}
           />
         ))}
       </TicketListContainer>

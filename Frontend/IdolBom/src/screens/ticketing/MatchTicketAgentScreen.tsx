@@ -205,7 +205,7 @@ const ActionButtonText = styled.Text`
 
 export default function MatchTicketAgentScreen({ route }) {
   const { schedule } = route.params || {};
-  const reliabilityScore = 80; // 예시 데이터
+  const reliabilityScore = 61; // 예시 데이터
   const currentPosition = 1; // 예시 단계
 
   const navigation = useNavigation();
@@ -218,14 +218,14 @@ export default function MatchTicketAgentScreen({ route }) {
     <ScreenContainer>
       <BackgroundRectangle />
 
-      <ProfileImage />
-      <AgentNickname>대리인 닉네임</AgentNickname>
+      <ProfileImage source={{ uri: 'http://img1.kakaocdn.net/thumb/R640x640.q70/?fname=http://t1.kakaocdn.net/account_images/default_profile.jpeg' }} />
+      <AgentNickname>박지형</AgentNickname>
 
       <IterationsButton onPress={() => console.log('Iterations Button Pressed')}>
         <Octicons name="iterations" size={32} color="#3e95ff" />
       </IterationsButton>
 
-      <AgentIntroduction>자기소개입니다. 안녕하세요.</AgentIntroduction>
+      <AgentIntroduction>잘해요</AgentIntroduction>
 
       <ReliabilityContainer>
         <ReliabilityLabel>신뢰도</ReliabilityLabel>

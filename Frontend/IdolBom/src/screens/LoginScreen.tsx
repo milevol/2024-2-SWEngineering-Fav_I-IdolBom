@@ -23,18 +23,18 @@ const LoginScreen = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const setKakaoUserID = useSetRecoilState(kakaoUserIDState);
 
-/*   const clearWebViewCookiesAndCache = async () => {
+   const clearWebViewCookiesAndCache = async () => {
     try {
       await CookieManager.clearAll();
       console.log('WebView cookies cleared');
     } catch (error) {
       console.error('Error clearing WebView cookies: ', error);
     }
-  }; */
+  };
 
   const handleLogin = async () => {
     console.log('Login Button Pressed. Clearing cookies and cache. Showing WebView...');
-    //await clearWebViewCookiesAndCache();
+    await clearWebViewCookiesAndCache();
     setShowWebView(true);
   };
 

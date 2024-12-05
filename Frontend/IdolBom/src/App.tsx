@@ -167,19 +167,25 @@ const MyPageStack = () => {
           header: () => <TopBar />,
         }}
       />
+      <Stack.Screen
+        name="MatchTicketAgentScreen"
+        component={MatchTicketAgentScreen}
+        options={{
+          header: () => <Header title="대리인 매칭" />,
+        }}
+      />
     </Stack.Navigator>
   );
 };
-
 export default function App() {
   return (
    <RecoilRoot>
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {/* <Stack.Screen name="Loading" component={LoadingScreen} />
+        {/* <Stack.Screen name="Loading" component={LoadingScreen} />*/}
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Choose" component={ChooseIdolManyScreen} />
-        <Stack.Screen name="Main" component={MainTabs} />*/}
+        <Stack.Screen name="Main" component={MainTabs} />
 
             <Stack.Screen
               name="ReportScreen"

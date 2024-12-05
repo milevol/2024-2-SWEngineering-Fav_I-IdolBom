@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView } from 'react-native';
+import { SafeAreaView, TouchableOpacity, TouchableOpacityProps } from 'react-native';
 import styled from 'styled-components/native';
 import TicketingCard from '../components/mypage/TicketingCard';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useNavigation } from '@react-navigation/native';
+
 
 const ScreenContainer = styled(SafeAreaView)`
   flex: 1;
@@ -120,6 +122,7 @@ const RecordText = styled.Text`
 export default function MyPageScreen() {
   const [userInfo, setUserInfo] = useState(null);
   const [ticketingList, setTicketingList] = useState([]);
+  const navigation = useNavigation();
 
    const BACKEND_URL = process.env.BACKEND_URL;
 
@@ -142,8 +145,22 @@ export default function MyPageScreen() {
     fetchData();
   }, []);
 
+
+  const handleTicketPress = (ticket) => {
+    navigation.navigate('MatchTicketAgentScreen', {
+      schedule: {
+        date: new Date(ticket.scheduleID.scheduleDate).toLocaleDateString(),
+        title: ticket.scheduleID.scheduleName,
+        peopleCount: ticket.ticketNum,
+        preferredArea: ticket.preferredArea || '없음',
+        message: ticket.message || '없음'
+      }
+    });
+  };
+
+
   if (!userInfo) {
-    return null; // 로딩 상태를 처리하거나 스켈레톤 UI 추가 가능
+    return null;
   }
 
   return (
@@ -176,14 +193,17 @@ export default function MyPageScreen() {
           <RecordText>내 기록</RecordText>
         </RecordContainer>
         {ticketingList.map((ticket) => (
-          <TicketingCard
-            key={ticket.id}
-            title={ticket.scheduleID.scheduleName}
-            dateRange={new Date(ticket.scheduleID.scheduleDate).toLocaleDateString()}
-            meetingDate={ticket.scheduleID.description}
-            status={ticket.ticketingStatus === 0 ? '매칭중' : '완료'}
-            attendance={`${ticket.ticketNum}/6`}
-          />
+            <TouchableOpacity
+               key={ticket.id}
+               onPress={() => handleTicketPress(ticket)}
+               >
+                <TicketingCard
+                  title={ticket.scheduleID.scheduleName}
+                  dateRange={new Date(ticket.scheduleID.scheduleDate).toLocaleDateString()}
+                  meetingDate={ticket.scheduleID.description}
+                  status={ticket.ticketingStatus === 0 ? '매칭중' : '완료'}
+                  />
+             </TouchableOpacity>
         ))}
       </TicketListContainer>
     </ScreenContainer>
